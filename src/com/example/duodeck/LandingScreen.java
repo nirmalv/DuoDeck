@@ -1,14 +1,17 @@
 package com.example.duodeck;
 
+import com.example.duodeck.R;
 import com.example.duodeck.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -111,7 +114,9 @@ public class LandingScreen extends Activity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        findViewById(R.id.landing_bottom_button).setOnTouchListener(mDelayHideTouchListener);
+//        findViewById(R.id.start_solo_deck_from_landing).setOnTouchListener(mStartSoloDeckFromLanding);
+        
     }
 
     @Override
@@ -135,10 +140,30 @@ public class LandingScreen extends Activity {
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (AUTO_HIDE) {
                 delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
+            } 
             return false;
         }
     };
+    public void  mStartSoloDeckFromLanding(View view) {
+//        @Override
+//        public boolean onTouch(View view, MotionEvent motionEvent) {
+//            if (AUTO_HIDE) {
+                System.out.println("start new deck");
+//                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            	/** Called when the user clicks the Send button */
+            	    // Do something in response to button
+        		Intent intent = new Intent(this, Game.class);
+//        		EditText editText = (EditText) findViewById(R.id.edit_message);
+//        		String message = editText.getText().toString();
+//        		intent.putExtra(EXTRA_MESSAGE, message);
+        		startActivity(intent);
+//            } 
+            
+            
+//            return false;
+//        }
+    };
+    
 
     Handler mHideHandler = new Handler();
     Runnable mHideRunnable = new Runnable() {

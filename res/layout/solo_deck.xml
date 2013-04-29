@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_overlay" >
+
+    <TextView
+        android:id="@+id/solo_deck_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="@string/solo_deck_title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/display_current_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/solo_deck_title"
+        android:layout_centerHorizontal="true"
+        android:text="current card info goes here"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <Button
+        android:id="@+id/solo_done_with_this_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/display_current_card"
+        android:layout_centerHorizontal="true"
+        android:onClick="doneWithThisCard"
+        android:text="@string/done_with_this_card" />
+
+    <TextView
+        android:id="@+id/display_deck_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/solo_done_with_this_card"
+        android:layout_centerHorizontal="true"
+        android:layout_weight="0.11"
+        android:text="display deck info"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    
+</RelativeLayout>

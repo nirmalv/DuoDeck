@@ -1,0 +1,1 @@
+[http://www.dreamincode.net/forums/topic/110380-deck-of-cards-using-various-methods, Deck of Cards]
