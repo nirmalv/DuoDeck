@@ -25,13 +25,14 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int display_current_card=0x7f070005;
-        public static final int display_deck_info=0x7f070007;
+        public static final int display_current_card=0x7f070006;
+        public static final int display_deck_info=0x7f070008;
         public static final int fullscreen_content=0x7f070000;
         public static final int fullscreen_content_controls=0x7f070001;
         public static final int landing_bottom_button=0x7f070002;
-        public static final int solo_deck_title=0x7f070004;
-        public static final int solo_done_with_this_card=0x7f070006;
+        public static final int solo_deck_title=0x7f070005;
+        public static final int solo_done_with_this_card=0x7f070007;
+        public static final int start_coop_deck_from_landing=0x7f070004;
         public static final int start_solo_deck_from_landing=0x7f070003;
     }
     public static final class layout {
@@ -46,6 +47,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int goto_settings=0x7f050004;
         public static final int landing_page_main_text=0x7f050003;
         public static final int solo_deck_title=0x7f050006;
+        public static final int start_coop_deck=0x7f050008;
         public static final int start_solo_deck=0x7f050005;
     }
     public static final class style {

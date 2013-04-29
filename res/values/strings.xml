@@ -9,5 +9,6 @@
     <string name="start_solo_deck">Play Solo Deck</string>
     <string name="solo_deck_title">Solo Deck</string>
     <string name="done_with_this_card">Done! (get next card)</string>
+    <string name="start_coop_deck">Play with a Buddy</string>
 
 </resources>

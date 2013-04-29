@@ -57,6 +57,16 @@
                 android:layout_weight="1"
                 android:text="@string/start_solo_deck"
                 android:onClick="mStartSoloDeckFromLanding" />
+
+            <Button
+                android:id="@+id/start_coop_deck_from_landing"
+                style="?buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="mStartCoopDeckFromLanding"
+                android:text="@string/start_coop_deck" />
+
         </LinearLayout>
     </FrameLayout>
 
