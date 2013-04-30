@@ -24,8 +24,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.duodeck.workout.Game"></activity>
-    
+        <activity android:name="com.duodeck.workout.Game" >
+        </activity>
+        <activity
+            android:name="com.example.duodeck.Stats"
+            android:label="@string/title_activity_stats" >
+        </activity>
+        <activity
+            android:name="com.duodeck.workout.AndroidStorageActivity"
+            android:label="@string/title_activity_android_storage" >
+        </activity>
     </application>
 
 </manifest>

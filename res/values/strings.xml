@@ -14,5 +14,8 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="wwb_chooseAccount">Choose an Account to Login</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_stats">Stats</string>
+    <string name="title_activity_android_storage">AndroidStorageActivity</string>
 
 </resources>

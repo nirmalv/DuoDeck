@@ -150,12 +150,16 @@ public class LandingScreen extends Activity {
 		Intent intent = new Intent(this, Game.class);
 		startActivity(intent);
     };
-    
-    
-    public void mStartCoopDeckFromLanding(View view) {
+    public void mStartDuoDeckFromLanding(View view) {
+        System.out.println("start new DUO deck");
     	Intent intent = new Intent(this, WorkoutWithBuddyActivity.class);
     	startActivity(intent);
-    }
+    };
+    public void mGotoStatsFromLanding(View view) {
+        System.out.println("goto Stats from Landing");
+    	Intent intent = new Intent(this, AndroidStorageActivity.class);
+    	startActivity(intent);
+    };
 
     Handler mHideHandler = new Handler();
     Runnable mHideRunnable = new Runnable() {
