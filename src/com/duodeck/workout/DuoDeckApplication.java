@@ -18,7 +18,7 @@ public class DuoDeckApplication extends Application {
 	private boolean isServiceRunning = false;
 	private boolean isAccountsetup = false;
 	private boolean isConnected = false;
-	private GameStates currentGameState = GameStates.Alone;
+	private GameStates currentGameState = GameStates.Solo;
 	private SharedPreferences settings;
 	
 	/**

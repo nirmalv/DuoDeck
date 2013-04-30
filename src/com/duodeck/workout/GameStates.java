@@ -2,7 +2,7 @@ package com.duodeck.workout;
 
 public enum GameStates {
 
-	Alone,
+	Solo,
 	MeInviting,
 	BuddyInviting,
 	BothWorkingOut,
@@ -11,3 +11,4 @@ public enum GameStates {
 	BothDone;
 	
 }
+

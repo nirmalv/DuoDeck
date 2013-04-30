@@ -1,8 +1,7 @@
 package com.duodeck.workout;
 
-import java.util.Random;
 import java.util.ArrayList;
-
+import java.util.Random;
 
 /*
  * Heavily influenced by the post by crazyjugglerdrummer
