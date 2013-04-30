@@ -13,7 +13,7 @@ public class Game extends Activity {
 	public Deck deck = new Deck();
 
 	private GameStates gameStates;
-	public GameStates currentGameState;
+	public GameStates currentGameState = GameStates.Solo;
 		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

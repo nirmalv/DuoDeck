@@ -146,23 +146,9 @@ public class LandingScreen extends Activity {
         }
     };
     public void  mStartSoloDeckFromLanding(View view) {
-//        @Override
-//        public boolean onTouch(View view, MotionEvent motionEvent) {
-//            if (AUTO_HIDE) {
-                System.out.println("start new deck");
-//                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            	/** Called when the user clicks the Send button */
-            	    // Do something in response to button
-        		Intent intent = new Intent(this, Game.class);
-//        		EditText editText = (EditText) findViewById(R.id.edit_message);
-//        		String message = editText.getText().toString();
-//        		intent.putExtra(EXTRA_MESSAGE, message);
-        		startActivity(intent);
-//            } 
-            
-            
-//            return false;
-//        }
+        System.out.println("start new SOLO deck");
+		Intent intent = new Intent(this, Game.class);
+		startActivity(intent);
     };
     
     
