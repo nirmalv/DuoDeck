@@ -1,6 +1,7 @@
 package com.duodeck.workout;
 
 import com.duodeck.workout.util.SystemUiHider;
+import com.duodeck.workout.xmpp.WorkoutWithBuddyActivity;
 import com.example.duodeck.R;
 
 import android.annotation.TargetApi;
@@ -166,7 +167,8 @@ public class LandingScreen extends Activity {
     
     
     public void mStartCoopDeckFromLanding(View view) {
-    	
+    	Intent intent = new Intent(this, WorkoutWithBuddyActivity.class);
+    	startActivity(intent);
     }
 
     Handler mHideHandler = new Handler();

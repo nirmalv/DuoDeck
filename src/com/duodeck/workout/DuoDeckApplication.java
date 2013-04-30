@@ -12,6 +12,8 @@ public class DuoDeckApplication extends Application {
 	public static final String USER_STATUS = "offline";
 	public static final String FULL_JID = "full_jid";
 	
+	private String username;
+	private String token;
 	
 	private boolean isServiceRunning = false;
 	private boolean isAccountsetup = false;
@@ -29,10 +31,30 @@ public class DuoDeckApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		String username = settings.getString(DuoDeckApplication.ACCOUNT_NAME, "");
-		String token = settings.getString(DuoDeckApplication.ACCOUNT_TOKEN, "");
+		username = settings.getString(DuoDeckApplication.ACCOUNT_NAME, "");
+		token = settings.getString(DuoDeckApplication.ACCOUNT_TOKEN, "");
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 		
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public void setUsername(String uname) {
+		username = uname;
+		settings.edit().putString(ACCOUNT_NAME, uname);
+		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
+	}
+	
+	public String getAuthToken() {
+		return token;
+	}
+	
+	public void setAuthToken(String authToken) {
+		token = authToken;
+		settings.edit().putString(ACCOUNT_TOKEN, authToken);
+		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 	}
 
 	public boolean isServiceRunning() {
