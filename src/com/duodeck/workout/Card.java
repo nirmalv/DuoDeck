@@ -6,10 +6,11 @@ package com.duodeck.workout;
  */
 public class Card
 {
-	private int rank, suit;
+	private int suit, rank; // exercise is the same as suit
 
-	private static String[] suits = { "hearts", "spades", "diamonds", "clubs" };
-	private static String[] ranks  = { "Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King" };
+	private static String[] suits =		{ "spades", "clubs", "diamonds", "hearts" };
+	private static String[] exercises = { "pushups", "pushups", "situps", "situps" }; //"spades", "hearts", "diamonds", "clubs" 
+	private static String[] ranks  = 	{ "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14" };
 
 
 	Card(int suit, int rank)
@@ -24,12 +25,23 @@ public class Card
 		{
 			return "The FINISHED CARD";
 		} else {
-			return ranks[rank] + " of " + suits[suit];
+			return ranks[rank] + " " + exercises[suit];
 		}
 	}
 
-	public int getRank() {
-		 return rank;
+	public String getRank() {
+		 return ranks[rank];
+	}
+	
+	public String getExercise() {
+		return exercises[suit];
+	}
+	public int getExerciseAsInt() {
+		return suit;
+	}
+	
+	public String getSuit() {
+		return suits[suit];
 	}
     
 	public int getValue()
@@ -37,26 +49,22 @@ public class Card
     	switch(rank)
     	{
     		case -1: return -1;
-    		case 0: return 14;
-    		case 1: return 2;
-    		case 2: return 3;
-    		case 3: return 4;
-    		case 4: return 5;
-    		case 5: return 6;
-    		case 6: return 7;
-    		case 7: return 8;
-    		case 8: return 9;
-    		case 9: return 10;
-    		case 10: return 11;
-    		case 11: return 12;
-    		case 12: return 13;
+    		case 0: return 2;
+    		case 1: return 3;
+    		case 2: return 4;
+    		case 3: return 5;
+    		case 4: return 6;
+    		case 5: return 7;
+    		case 6: return 8;
+    		case 7: return 9;
+    		case 8: return 10;
+    		case 9: return 11;
+    		case 10: return 12;
+    		case 11: return 13;
+    		case 12: return 14;
     		default: return 0;
     	}
     }
-	
-	public int getSuit() {
-		return suit;
-	}
 
 }
 

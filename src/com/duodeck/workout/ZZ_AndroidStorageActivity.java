@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.example.duodeck.R;
 
-public class AndroidStorageActivity extends Activity implements OnClickListener{
+public class ZZ_AndroidStorageActivity extends Activity implements OnClickListener{
 
 	private String filename = "MySampleFile.txt";
 	private String filepath = "MyFileStorage";

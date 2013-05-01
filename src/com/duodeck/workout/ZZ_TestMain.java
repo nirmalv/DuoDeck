@@ -1,6 +1,6 @@
 package com.duodeck.workout;
 
-public class TestMain {
+public class ZZ_TestMain {
 
 	/**
 	 * @param args
