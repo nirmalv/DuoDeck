@@ -20,6 +20,8 @@ public class DuoDeckApplication extends Application {
 	private boolean isConnected = false;
 	private GameStates currentGameState = GameStates.Solo;
 	private SharedPreferences settings;
+
+	private PersistentStorage ps;
 	
 	/**
 	 * Constructor
@@ -34,6 +36,7 @@ public class DuoDeckApplication extends Application {
 		username = settings.getString(DuoDeckApplication.ACCOUNT_NAME, "");
 		token = settings.getString(DuoDeckApplication.ACCOUNT_TOKEN, "");
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
+		ps = new PersistentStorage();
 		
 	}
 	
@@ -97,5 +100,8 @@ public class DuoDeckApplication extends Application {
 		this.settings = settings;
 	}
 	
+	public PersistentStorage getPersistentStorage() {
+		return ps;
+	}
 	
 }

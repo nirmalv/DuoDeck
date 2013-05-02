@@ -56,12 +56,12 @@ public class PersistentStorage {
     
     
     
-    public void saveDataToSharedPrefs(Context context, String key, String data) 
+    public void saveWorkoutDataToSharedPrefs(Context context, String key, String data) 
 	{ 	// We need an Editor object to make preference changes. All objects are from android.context.Context
         context.getSharedPreferences(STORAGE_STATS_DECK1, 0).edit().putString(key, data).commit();
 	}
 	
-	public String getDataFromSharedPrefs(Context context, String key)
+	public String getWorkoutDataFromSharedPrefs(Context context, String key)
 	{
 		return context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(key, "");
 	}

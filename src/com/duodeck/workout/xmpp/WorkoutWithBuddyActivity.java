@@ -17,7 +17,7 @@ import android.view.Menu;
 import android.widget.ListView;
 
 import com.duodeck.workout.DuoDeckApplication;
-import com.example.duodeck.R;
+import com.duodeck.workout.R;
 
 public class WorkoutWithBuddyActivity extends Activity {
 

@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.duodeck.R;
+import com.duodeck.workout.R;
 
 public class StatsAdapter extends ArrayAdapter<Stats>{
 
