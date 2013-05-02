@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.duodeck.workout.TrackStatsWhilePlaying.InGameStatsBySuit;
 import com.example.duodeck.R;
 
-public class Game extends Activity {
+public class GameActivity extends Activity {
 
 	private PersistentStorage ps = new PersistentStorage();
 	
@@ -124,7 +124,7 @@ public class Game extends Activity {
 					
 					String statsAsString = ps.makeWorkoutStringForStorage(deck);
 //					System.out.println("stats as string: " + statsAsString);
-					ps.saveDataToSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK, statsAsString);
+					ps.saveDataToSharedPrefs(GameActivity.this, ps.KEY_PREVIOUS_DECK, statsAsString);
 					
 					// neuter the "next card" button
 					View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
@@ -132,7 +132,7 @@ public class Game extends Activity {
 					
 					
 					
-					System.out.println("from STORAGE: " + ps.getDataFromSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK));
+					System.out.println("from STORAGE: " + ps.getDataFromSharedPrefs(GameActivity.this, ps.KEY_PREVIOUS_DECK));
 					
 					
 					// TODO: record deck stats in stats
@@ -178,7 +178,7 @@ public class Game extends Activity {
 //		TextView responseText = (TextView) findViewById(R.id.textView1);
 //		ps.saveDataToFile(inputText, responseText);
 //		"
-		ps.saveDataToSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK, inputText.getText().toString());
+		ps.saveDataToSharedPrefs(GameActivity.this, ps.KEY_PREVIOUS_DECK, inputText.getText().toString());
 
 //		System.out.println("saved data.");
 	}
@@ -192,7 +192,7 @@ public class Game extends Activity {
 		String data = "";
 //		System.out.println(ps.getDataFromInternalStorage(inputText, responseText, data));
 
-		System.out.println(ps.getDataFromSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK));
+		System.out.println(ps.getDataFromSharedPrefs(GameActivity.this, ps.KEY_PREVIOUS_DECK));
 
 //		System.out.println("retrieved data.");
 	}
