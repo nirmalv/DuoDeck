@@ -18,7 +18,8 @@ public class PersistentStorage {
 	//    public static final String KEY_TEMP_SESSION_START_TIMESTAMP = "SessionStartTimestamp"; // allows us to calibrate in the case of interruptions
 	//    public static final String KEY_TEMP_SESSION_START_TIMER_VALUE = "SessionStartTimerValue"; // allows us to calibrate in the case of interruptions
     // keys to use per deck
-    public static final String KEY_PREVIOUS_DECK = "DurationOfPreviousDeck";
+    // TODO: count of decks completed
+	public static final String KEY_PREVIOUS_DECK = "DurationOfPreviousDeck";
 	//    public static final String KEY_FIRST_DATE = "FirstWorkoutDate";
 	//    public static final String KEY_FASTEST_TIME = "FastestTime";
 	//    public static final String KEY_SLOWEST_TIME = "SlowestTime"; // use for showing improvement only

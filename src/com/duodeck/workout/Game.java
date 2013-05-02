@@ -16,6 +16,9 @@ public class Game extends Activity {
 	private PersistentStorage ps = new PersistentStorage();
 	
 	private GameStates gameStates;
+	// TODO: load DuoDeckApp
+	// TODO: get context of DuoDeckApp in onCreate
+	// TODO: get game state
 	public GameStates currentGameState = GameStates.Solo;
 	
 	public Deck deck = new Deck();
@@ -143,6 +146,10 @@ public class Game extends Activity {
 				}
 	
 				break;
+				
+				
+			// TODO: person receiving the card needs to remove the used card
+				
 				
 			case MeWaitingBuddyWorkingOut:
 				// TODO: record the time that this was finished
