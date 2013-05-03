@@ -19,7 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.duodeck.R;
+import com.duodeck.workout.R;
 
 public class ZZ_AndroidStorageActivity extends Activity implements OnClickListener{
 

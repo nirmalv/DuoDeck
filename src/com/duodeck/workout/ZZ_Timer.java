@@ -1,6 +1,6 @@
 package com.duodeck.workout;
 
-public class Timer {
+public class ZZ_Timer {
 	private int[] timestamps = {}; // how can i add more items to an array easily?
 	private int[] durations = {};  // how can i add more items to an array easily?
 	

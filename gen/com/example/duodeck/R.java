@@ -33,44 +33,63 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
+        public static final int victory_icon_r1_c1=0x7f020001;
+        public static final int victory_icon_r1_c3=0x7f020002;
+        public static final int victory_icon_r1_c5=0x7f020003;
+        public static final int victory_icon_r1_c7=0x7f020004;
+        public static final int victory_icon_r3_c1=0x7f020005;
+        public static final int victory_icon_r3_c3=0x7f020006;
+        public static final int victory_icon_r3_c5=0x7f020007;
+        public static final int victory_icon_r3_c7=0x7f020008;
+        public static final int victory_icon_r5_c1=0x7f020009;
+        public static final int victory_icon_r5_c3=0x7f02000a;
+        public static final int victory_icon_r5_c5=0x7f02000b;
+        public static final int victory_icon_r5_c7=0x7f02000c;
     }
     public static final class id {
-        public static final int Button01=0x7f090016;
-        public static final int Button02=0x7f090010;
-        public static final int action_settings=0x7f09001c;
-        public static final int button1=0x7f090017;
-        public static final int button2=0x7f090011;
-        public static final int chronoPause=0x7f090019;
-        public static final int chronoResume=0x7f09001a;
-        public static final int chronometer1=0x7f090018;
-        public static final int display_current_card=0x7f09000e;
-        public static final int display_deck_info=0x7f090013;
-        public static final int editText1=0x7f090012;
+        public static final int Button01=0x7f09001b;
+        public static final int Button02=0x7f090015;
+        public static final int action_settings=0x7f090021;
+        public static final int button1=0x7f09001c;
+        public static final int button2=0x7f090016;
+        public static final int chronoPause=0x7f09001e;
+        public static final int chronoResume=0x7f09001f;
+        public static final int chronometer1=0x7f09001d;
+        public static final int display_current_card=0x7f090013;
+        public static final int display_deck_info=0x7f090018;
+        public static final int editText1=0x7f090017;
         public static final int fullscreen_content=0x7f090006;
         public static final int fullscreen_content_controls=0x7f090007;
         public static final int getExternalStorage=0x7f090004;
         public static final int getInternalStorage=0x7f090002;
+        public static final int imgIcon=0x7f09000d;
         public static final int landing_bottom_button=0x7f090008;
-        public static final int menu_settings=0x7f09001b;
+        public static final int menu_settings=0x7f090020;
         public static final int myInputText=0x7f090000;
         public static final int responseText=0x7f090005;
         public static final int saveExternalStorage=0x7f090003;
         public static final int saveInternalStorage=0x7f090001;
-        public static final int solo_deck_title=0x7f09000d;
-        public static final int solo_done_with_this_card=0x7f09000f;
+        public static final int solo_deck_title=0x7f090012;
+        public static final int solo_done_with_this_card=0x7f090014;
         public static final int start_coop_deck_from_landing=0x7f09000a;
         public static final int start_solo_deck_from_landing=0x7f090009;
-        public static final int staticTimeValueDisplay=0x7f090015;
-        public static final int textView1=0x7f090014;
-        public static final int wwb_buddyList=0x7f09000c;
-        public static final int wwb_displayLabel=0x7f09000b;
+        public static final int staticTimeValueDisplay=0x7f09001a;
+        public static final int statsActivityListView=0x7f09000b;
+        public static final int textView1=0x7f090019;
+        public static final int txtHeader=0x7f09000c;
+        public static final int txtTitle=0x7f09000e;
+        public static final int txtValue=0x7f09000f;
+        public static final int wwb_buddyList=0x7f090011;
+        public static final int wwb_displayLabel=0x7f090010;
     }
     public static final class layout {
         public static final int activity_android_storage=0x7f030000;
         public static final int activity_landing_screen=0x7f030001;
         public static final int activity_stats=0x7f030002;
-        public static final int activity_workout_with_buddy=0x7f030003;
-        public static final int solo_deck=0x7f030004;
+        public static final int activity_stats_header=0x7f030003;
+        public static final int activity_stats_row=0x7f030004;
+        public static final int activity_workout_with_buddy=0x7f030005;
+        public static final int solo_deck=0x7f030006;
     }
     public static final class menu {
         public static final int activity_android_storage=0x7f080000;
@@ -84,6 +103,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int dummy_button=0x7f060002;
         public static final int dummy_content=0x7f060001;
         public static final int goto_settings=0x7f060004;
+        public static final int goto_stats=0x7f060011;
         public static final int hello_world=0x7f06000b;
         public static final int landing_page_main_text=0x7f060003;
         public static final int menu_settings=0x7f06000d;

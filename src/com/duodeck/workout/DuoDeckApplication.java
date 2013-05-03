@@ -1,13 +1,7 @@
 package com.duodeck.workout;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import android.app.Application;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
@@ -25,8 +19,9 @@ public class DuoDeckApplication extends Application {
 	private boolean isAccountsetup = false;
 	private boolean isConnected = false;
 	private GameStates currentGameState = GameStates.Solo;
-	private HashMap<String, String> contactList = new HashMap<String, String>();
 	private SharedPreferences settings;
+
+	private PersistentStorage ps;
 	
 	/**
 	 * Constructor
@@ -41,26 +36,24 @@ public class DuoDeckApplication extends Application {
 		username = settings.getString(DuoDeckApplication.ACCOUNT_NAME, "");
 		token = settings.getString(DuoDeckApplication.ACCOUNT_TOKEN, "");
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
-		startService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
+		ps = new PersistentStorage();
+                startService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
 	}
-	
-	@Override
+
+       @Override
 	public void onTerminate() {
 		// Its ok even if this method is not called, since we could reuse the service
 		stopService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
-	}
-	
+	}	
+
 	public String getUsername() {
 		return username;
 	}
 	
 	public void setUsername(String uname) {
 		username = uname;
-		Editor edit = settings.edit();
-		edit.putString(ACCOUNT_NAME, uname);
-		edit.commit();
+		settings.edit().putString(ACCOUNT_NAME, uname);
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
-		System.out.println("Got " + uname + " and " + isAccountsetup);
 	}
 	
 	public String getAuthToken() {
@@ -69,11 +62,8 @@ public class DuoDeckApplication extends Application {
 	
 	public void setAuthToken(String authToken) {
 		token = authToken;
-		Editor edit = settings.edit();
-		edit.putString(ACCOUNT_TOKEN, authToken);
-		edit.commit();
+		settings.edit().putString(ACCOUNT_TOKEN, authToken);
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
-		System.out.println("Got " + authToken + " and " + isAccountsetup);
 	}
 
 	public boolean isServiceRunning() {
@@ -115,18 +105,9 @@ public class DuoDeckApplication extends Application {
 	public void setSettings(SharedPreferences settings) {
 		this.settings = settings;
 	}
-
-	public ArrayList<String> getContactList() {
-		HashSet<String> cList = new HashSet<String>();
-		for (String JID : this.contactList.keySet()) {
-			cList.add(this.contactList.get(JID));
-		}
-		return new ArrayList<String>(cList);
-	}
-
-	public void updateContactList(String JID, String user) {
-		this.contactList.put(JID, user);
-	}
 	
+	public PersistentStorage getPersistentStorage() {
+		return ps;
+	}
 	
 }

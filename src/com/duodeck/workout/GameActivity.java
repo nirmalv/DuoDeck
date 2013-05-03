@@ -8,14 +8,18 @@ import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.duodeck.workout.R;
 import com.duodeck.workout.TrackStatsWhilePlaying.InGameStatsBySuit;
-import com.example.duodeck.R;
 
-public class Game extends Activity {
+public class GameActivity extends Activity {
 
-	private PersistentStorage ps = new PersistentStorage();
+    private DuoDeckApplication duoDeckApp;
+	private PersistentStorage ps;
 	
 	private GameStates gameStates;
+	// TODO: load DuoDeckApp
+	// TODO: get context of DuoDeckApp in onCreate
+	// TODO: get game state
 	public GameStates currentGameState = GameStates.Solo;
 	
 	public Deck deck = new Deck();
@@ -28,12 +32,16 @@ public class Game extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    
+
+    	duoDeckApp = (DuoDeckApplication) getApplication();
+    	ps = duoDeckApp.getPersistentStorage();
+		
 		setContentView(R.layout.solo_deck);
 
 		startChronometer(null);
 		
 		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
+		deck.inGameStats.setStartDate();
 		currentCard = deck.drawFromDeck();
 		displayOfCurrentCard.setText("this card: " + currentCard + "\t\t" + deck.getCardsRemaining() + "/" + deck.getDeckSize() );
 		
@@ -121,7 +129,9 @@ public class Game extends Activity {
 					
 					String statsAsString = ps.makeWorkoutStringForStorage(deck);
 //					System.out.println("stats as string: " + statsAsString);
-					ps.saveDataToSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK, statsAsString);
+					ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, statsAsString);
+
+					ps.updateStatsWithNewDeck(GameActivity.this, deck);
 					
 					// neuter the "next card" button
 					View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
@@ -129,7 +139,7 @@ public class Game extends Activity {
 					
 					
 					
-					System.out.println("from STORAGE: " + ps.getDataFromSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK));
+					System.out.println("from STORAGE: " + ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.PreviousDeck));
 					
 					
 					// TODO: record deck stats in stats
@@ -143,6 +153,10 @@ public class Game extends Activity {
 				}
 	
 				break;
+				
+				
+			// TODO: person receiving the card needs to remove the used card
+				
 				
 			case MeWaitingBuddyWorkingOut:
 				// TODO: record the time that this was finished
@@ -171,7 +185,7 @@ public class Game extends Activity {
 //		TextView responseText = (TextView) findViewById(R.id.textView1);
 //		ps.saveDataToFile(inputText, responseText);
 //		"
-		ps.saveDataToSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK, inputText.getText().toString());
+		ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, inputText.getText().toString());
 
 //		System.out.println("saved data.");
 	}
@@ -185,7 +199,7 @@ public class Game extends Activity {
 		String data = "";
 //		System.out.println(ps.getDataFromInternalStorage(inputText, responseText, data));
 
-		System.out.println(ps.getDataFromSharedPrefs(Game.this, ps.KEY_PREVIOUS_DECK));
+		System.out.println(ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.PreviousDeck));
 
 //		System.out.println("retrieved data.");
 	}
