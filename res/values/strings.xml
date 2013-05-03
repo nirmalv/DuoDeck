@@ -19,5 +19,6 @@
     <string name="title_activity_android_storage">AndroidStorageActivity</string>
     <string name="title_activity_game">Game (solo or duo)</string>
     <string name="goto_stats">Stats</string>
+    <string name="wwb_default_label">Online Buddies</string>
 
 </resources>

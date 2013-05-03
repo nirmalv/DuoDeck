@@ -1,7 +1,13 @@
 package com.duodeck.workout;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
@@ -19,6 +25,7 @@ public class DuoDeckApplication extends Application {
 	private boolean isAccountsetup = false;
 	private boolean isConnected = false;
 	private GameStates currentGameState = GameStates.Solo;
+	private HashMap<String, String> contactList = new HashMap<String, String>();
 	private SharedPreferences settings;
 
 	private PersistentStorage ps;
@@ -37,7 +44,7 @@ public class DuoDeckApplication extends Application {
 		token = settings.getString(DuoDeckApplication.ACCOUNT_TOKEN, "");
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 		ps = new PersistentStorage();
-                startService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
+        startService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
 	}
 
        @Override
@@ -52,7 +59,9 @@ public class DuoDeckApplication extends Application {
 	
 	public void setUsername(String uname) {
 		username = uname;
-		settings.edit().putString(ACCOUNT_NAME, uname);
+		Editor edit = settings.edit();
+		edit.putString(ACCOUNT_NAME, uname);
+		edit.commit();
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 	}
 	
@@ -62,7 +71,9 @@ public class DuoDeckApplication extends Application {
 	
 	public void setAuthToken(String authToken) {
 		token = authToken;
-		settings.edit().putString(ACCOUNT_TOKEN, authToken);
+		Editor edit = settings.edit();
+		edit.putString(ACCOUNT_TOKEN, authToken);
+		edit.commit();
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 	}
 
@@ -104,6 +115,18 @@ public class DuoDeckApplication extends Application {
 
 	public void setSettings(SharedPreferences settings) {
 		this.settings = settings;
+	}
+	
+	public ArrayList<String> getContactList() {
+		HashSet<String> cList = new HashSet<String>();
+		for (String JID : this.contactList.keySet()) {
+			cList.add(this.contactList.get(JID));
+		}
+		return new ArrayList<String>(cList);
+	}
+	
+	public void updateContactList(String JID, String user) {
+		this.contactList.put(JID, user);
 	}
 	
 	public PersistentStorage getPersistentStorage() {

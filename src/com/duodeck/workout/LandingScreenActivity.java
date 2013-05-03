@@ -19,7 +19,7 @@ import android.view.View.OnTouchListener;
  *
  * @see SystemUiHider
  */
-public class LandingScreen extends Activity {
+public class LandingScreenActivity extends Activity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -146,7 +146,7 @@ public class LandingScreen extends Activity {
     };
     public void  mStartSoloDeckFromLanding(View view) {
         System.out.println("start new SOLO deck");
-		Intent intent = new Intent(this, Game.class);
+		Intent intent = new Intent(this, GameActivity.class);
 		startActivity(intent);
     };
     public void mStartDuoDeckFromLanding(View view) {
