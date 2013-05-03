@@ -3,6 +3,7 @@ package com.duodeck.workout;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 
+import android.R;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Service;
@@ -54,15 +55,9 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			case MSG_LOGIN:
 				connect();
 				break;
-			case MSG_GET_ROSTER:
-				duoDeckConnection.getOnlineContacts();
-				break;
 			case MSG_INVITE:
+				
 				break;
-			//case MSG_CANCEL_INVITE:
-				//break;
-			//case MSG_WORKOUT_SEND:
-				//break;
 			default:
 				super.handleMessage(msg);
 			}
@@ -143,9 +138,10 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	}
 
 	@Override
-	public void invite(String fromJID) {
+	public void invite(String user) {
 		// TODO Auto-generated method stub
-		System.out.println("Got Invite from :" + fromJID);
+		System.out.println("Got Invite from :" + user);
+		
 	}
 
 

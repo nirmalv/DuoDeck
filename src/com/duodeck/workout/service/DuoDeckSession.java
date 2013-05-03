@@ -8,74 +8,49 @@ import org.jivesoftware.smack.XMPPException;
 public class DuoDeckSession {
 
 	private Chat chat;
-	private String username;
-	private Buddy buddy;
+	private String myName;
+	private String buddyName;
+	private boolean accepted;
 	
-	public DuoDeckSession(Chat chat, String username) {
+	public DuoDeckSession(Chat chat, String myName, String buddyName) {
 		this.chat = chat;
-		this.username = username;
-		this.buddy = new Buddy();
+		this.myName = myName;
+		this.buddyName = buddyName;
 	}
 	
 	public void sendInvite() throws IOException, XMPPException {
-		DuoDeckMessage.create(DuoDeckMessage.MessageType.Invite, username)
+		DuoDeckMessage.create(DuoDeckMessage.MessageType.Invite, buddyName)
 					  .send(this);
 	}
 	
-	public void initBuddySession(String fromUser) {
-		this.buddy.setUsername(fromUser);
-		this.buddy.setAccepted();
-	}
-	
 	public void sendMessage(DuoDeckMessage message) throws XMPPException, IOException {
-		sendMessage(message.put(DuoDeckMessage.MessageKey.User, username).toMessageString());
+		sendMessage(message.put(DuoDeckMessage.MessageKey.User, myName).toMessageString());
 	}
 	
 	public void sendMessage(String message) throws XMPPException {
 		chat.sendMessage(message);
 	}
 	
-	public Buddy getBuddy() {
-		return buddy;
+	public String getBuddyName() {
+		return buddyName;
+	}
+	
+	public String getMyName() {
+		return myName;
 	}
 	
 	public void buddyAccepted(String user) {
-		if (buddy.getUsername().equals(user))
-			buddy.setAccepted();
+		if (buddyName.equals(buddyName))
+			accepted = true;
 	}
 	
 	public void buddyDeclined(String user) {
-		if (buddy.getUsername().equals(user)) 
-			buddy.setDeclined();
+		if (buddyName.equals(buddyName)) 
+			accepted = false;
 	}
 	
 	public void close(DuoDeckConnectionManager conn) {
-		chat.removeMessageListener(conn);
+		if (conn != null)
+			chat.removeMessageListener(conn);
 	}
-	
-	public static class Buddy {
-		private String username;
-		private boolean accepted;
-		
-		public String getUsername() {
-			return this.username;
-		}
-		
-		public void setUsername(String uname) {
-			this.username = uname;
-		}
-
-		public boolean isAccepted() {
-			return accepted;
-		}
-		
-		public void setAccepted() {
-			this.accepted = true;
-		}
-		
-		public void setDeclined() {
-			this.accepted = false;
-		}
-	}
-	
 }

@@ -40,7 +40,7 @@
             android:label="@string/title_activity_android_storage" >
         </activity>
         <activity
-            android:name="com.duodeck.workout.xmpp.WorkoutWithBuddyActivity"
+            android:name="com.duodeck.workout.WorkoutWithBuddyActivity"
             android:label="@string/title_activity_workout_with_buddy" >
         </activity>
         

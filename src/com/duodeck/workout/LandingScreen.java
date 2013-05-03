@@ -1,7 +1,6 @@
 package com.duodeck.workout;
 
 import com.duodeck.workout.util.SystemUiHider;
-import com.duodeck.workout.xmpp.WorkoutWithBuddyActivity;
 import com.example.duodeck.R;
 
 import android.annotation.TargetApi;

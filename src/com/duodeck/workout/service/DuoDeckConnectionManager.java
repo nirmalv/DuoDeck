@@ -1,7 +1,6 @@
 package com.duodeck.workout.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.jivesoftware.smack.Chat;
@@ -74,10 +73,6 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		return this.username;
 	}
 	
-	public DuoDeckSession.Buddy getBuddy() {
-		return session.getBuddy();
-	}
-	
 	protected void initConfig() {
 		SASLAuthentication.registerSASLMechanism(SASLGoogleByOAuth.MECHANISM_NAME, SASLGoogleByOAuth.class);
 		SASLAuthentication.supportSASLMechanism(SASLGoogleByOAuth.MECHANISM_NAME);
@@ -109,6 +104,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					System.out.println(xmppConnection.getUser());
 					((DuoDeckApplication) appContext).setConnected(true);
 					listener.loginResponse(true);
+					registerForRosterUpdates();
 				} catch(XMPPException e) {
 					e.printStackTrace();
 					((DuoDeckApplication) appContext).setConnected(false);
@@ -127,6 +123,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			xmppConnection.disconnect();
 			xmppConnection = null;
 		}
+		this.username = "";
 		listener = null;
 	}
 	
@@ -142,8 +139,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		return xmppConnection != null && xmppConnection.isConnected();
 	}
 	
-	public void getOnlineContacts() {
-		ArrayList<String> contactList = new ArrayList<String>();
+	private void registerForRosterUpdates() {
 		if (xmppConnection != null) {
 			Roster roster = xmppConnection.getRoster();
 			roster.addRosterListener(new RosterListener() {
@@ -163,18 +159,16 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					System.out.println("Presence changed:" + presence.getFrom() + " " + presence);
 					String JID = presence.getFrom();
 					String user = StringUtils.parseName(JID);
-					((DuoDeckApplication) appContext).updateContactList(JID, user);
-					System.out.println("JID: " + JID + " , user: " + user);
-					listener.getRosterResponse();
+					String resource = StringUtils.parseResource(JID);
+					// change the resource from gmail to duo-deck after debugging
+					if (resource.contains("gmail") && presence.toString().equals("available")){ 
+						((DuoDeckApplication) appContext).updateContactList(JID, user);
+						System.out.println("JID: " + JID + " , user: " + user);
+						listener.getRosterResponse();
+					}
 				}
 				
 			});
-			/*for (RosterEntry entry : roster.getEntries()) {
-				String user = entry.getUser();
-				System.out.println("Contact:" + user + " presence: " + roster.getPresence(user).getType().toString());
-				if (roster.getPresence(user).getType() == Presence.Type.available)
-					contactList.add(user);	
-			}*/
 		}
 	}
 	
@@ -190,18 +184,45 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		}
 	}
 	
-	public void startSession(String user) throws IOException, XMPPException {
-		Chat c = xmppConnection.getChatManager().createChat(user, this);
-		session = new DuoDeckSession(c, this.username);
+	public void inviteBuddy(String buddyName) throws IOException, XMPPException {
+		if (session != null){
+			if (session.getBuddyName().equals(buddyName)) {
+				session.sendInvite();
+				return;
+			}
+			else
+				session.close(this);
+		}
+		Chat c = xmppConnection.getChatManager().createChat(buddyName, APP_CHAT_RESOURCE, this);
+		session = new DuoDeckSession(c, this.username, buddyName);
+		session.sendInvite();
 	}
 	
 	@Override
-	public void chatCreated(Chat chat, boolean created) {
+	public void chatCreated(Chat chat, boolean createdLocal) {
 		// TODO Auto-generated method stub
-		if (!created) {
-			session = new DuoDeckSession(chat, username);
-			chat.addMessageListener(this);
-			System.out.println("Chat session created");
+		
+		if (!createdLocal) {
+			if (session == null) {
+				session = new DuoDeckSession(chat, username, chat.getParticipant());
+				chat.addMessageListener(this);
+				System.out.println("Chat session created with " + chat.getParticipant());
+			} else if (chat.getThreadID().contains(APP_CHAT_RESOURCE)){
+				System.out.println("Sorry, we are alreay in a workout session");
+				DuoDeckSession temp = new DuoDeckSession(chat, username, chat.getParticipant());
+				try {
+					// we are already in a workout session, so decline invite
+					DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString())
+								  .send(temp);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (XMPPException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				temp = null;
+			}
 		}
 	}
 
@@ -244,11 +265,13 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	private void notifyInvite(DuoDeckMessage prop) {
 		String fromJID = prop.getProperty(DuoDeckMessage.MessageKey.User);
+		System.out.println("Received invite from: " + fromJID);
 		if (listener != null)
-			listener.invite(fromJID);
+			listener.invite(StringUtils.parseName(fromJID));
 	}
 	
 	public static void close() {
+		//make sure to call this method at the end of the workout completion
 		if (isInitiated()) {
 			instance.disconnect();
 			instance.xmppConnection = null;

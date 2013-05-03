@@ -1,4 +1,4 @@
-package com.duodeck.workout.xmpp;
+package com.duodeck.workout;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,8 +29,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.duodeck.workout.DuoDeckApplication;
-import com.duodeck.workout.DuoDeckService;
 import com.example.duodeck.R;
 
 public class WorkoutWithBuddyActivity extends Activity {
@@ -54,7 +52,6 @@ public class WorkoutWithBuddyActivity extends Activity {
 			switch(msg.what) {
 			case DuoDeckService.MSG_LOGIN:
 				if (msg.arg1 == 0) {
-					System.out.println("auth failed received at Activity");
 					if (authAttempt <= 1) {
 						getAuthToken(accSelected, true);
 						authAttempt += 1;
@@ -62,8 +59,6 @@ public class WorkoutWithBuddyActivity extends Activity {
 						labelDisplay.setText("Authentication Failed.");
 						authAttempt = 0;
 					}
-				} else {
-					sendMsgToService(DuoDeckService.MSG_GET_ROSTER);
 				}
 				break;
 			case DuoDeckService.MSG_GET_ROSTER:
@@ -79,7 +74,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			mService = new Messenger(service);
-			sendMsgToService(DuoDeckService.MSG_REGISTER);
+			sendMsgToService(DuoDeckService.MSG_REGISTER, 1, 1);
 		}
 		
 		@Override
@@ -119,14 +114,13 @@ public class WorkoutWithBuddyActivity extends Activity {
 		if (mService == null)
 			bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
 		
-		//System.out.println("Listview's bottom: " + listView.getBottom());
 		listView.setAdapter(new ArrayAdapter<String>(this, R.layout.activity_workout_with_buddy, R.id.wwb_displayLabel, contactList));
 		listView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
-				// TODO Auto-generated method stub
-				System.out.println("Selected " + pos);
+				// Here we need to mark the time for timeout check
+				sendMsgToService(DuoDeckService.MSG_INVITE, pos, 1);
 			}
 			
 		});
@@ -137,12 +131,12 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		sendMsgToService(DuoDeckService.MSG_UNREGISTER);
+		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
 		unbindService(mConnection);
 	}
 	
-	private void sendMsgToService(int type) {
-		Message msg = Message.obtain(null, type);
+	private void sendMsgToService(int type, int arg1, int arg2) {
+		Message msg = Message.obtain(null, type, arg1, arg2);
 		msg.replyTo = mMessenger;
 		try {
 			if (mService != null)
@@ -189,7 +183,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 							bundle = future.getResult();
 							String authtoken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
 							duoDeckApp.setAuthToken(authtoken);
-							sendMsgToService(DuoDeckService.MSG_LOGIN);
+							sendMsgToService(DuoDeckService.MSG_LOGIN,1,1);
 							System.out.println("Done calling MSG_LOGIN");
 						} catch (OperationCanceledException e) {
 							System.out.println("User denied authorization");
@@ -206,10 +200,12 @@ public class WorkoutWithBuddyActivity extends Activity {
 	}
 	
 	private void displayRoster() {
-		contactList = duoDeckApp.getContactList();
+		contactList.clear();
+		contactList.addAll(duoDeckApp.getContactList());
 		if (contactList.size() == 0)
-			labelDisplay.setText("Currently no contacts are available online");
+			labelDisplay.setText("No contacts available online");
 		else 
 			labelDisplay.setText("Online Buddies");
+		
 	}
 }
