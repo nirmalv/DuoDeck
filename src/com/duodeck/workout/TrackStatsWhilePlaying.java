@@ -58,7 +58,7 @@ public class TrackStatsWhilePlaying {
 	}
 
 	public void setStartDate() {
-		dateStarted = "";
+//		dateStarted = ;
 	}
 
 }
