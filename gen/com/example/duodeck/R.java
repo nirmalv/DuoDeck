@@ -95,6 +95,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int title_activity_stats=0x7f06000e;
         public static final int title_activity_workout_with_buddy=0x7f060009;
         public static final int wwb_chooseAccount=0x7f06000c;
+        public static final int wwb_default_label=0x7f060011;
     }
     public static final class style {
         /** 

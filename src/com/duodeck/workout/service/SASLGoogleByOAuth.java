@@ -25,7 +25,7 @@ public class SASLGoogleByOAuth extends SASLMechanism {
 	@Override
 	protected String getName() {
 		// TODO Auto-generated method stub
-		return null;
+		return MECHANISM_NAME;
 	}
 	
     @Override

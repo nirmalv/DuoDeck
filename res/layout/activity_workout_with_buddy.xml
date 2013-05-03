@@ -12,7 +12,7 @@
         android:id="@+id/wwb_displayLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:text="@string/wwb_default_label" />
 
     <ListView
         android:id="@+id/wwb_buddyList"
