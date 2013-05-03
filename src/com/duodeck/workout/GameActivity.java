@@ -41,6 +41,7 @@ public class GameActivity extends Activity {
 		startChronometer(null);
 		
 		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
+		deck.inGameStats.setStartDate();
 		currentCard = deck.drawFromDeck();
 		displayOfCurrentCard.setText("this card: " + currentCard + "\t\t" + deck.getCardsRemaining() + "/" + deck.getDeckSize() );
 		

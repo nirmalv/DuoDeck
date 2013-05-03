@@ -57,7 +57,7 @@ public class PersistentStorage {
 			case DecksCompleted:
 				context.getSharedPreferences(STORAGE_STATS_DECK1, 0).edit().putString(key.toString(), data).commit();
 				break;
-			case DateFirstDeck:
+			case FirstDeck:
 				context.getSharedPreferences(STORAGE_STATS_DECK1, 0).edit().putString(key.toString(), data).commit();
 				break;
 			case DateSinceLastDeck:
@@ -89,8 +89,8 @@ public class PersistentStorage {
 			case DecksCompleted:
 				s = context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(StatKeys.DecksCompleted.toString(), "");
 				break;
-			case DateFirstDeck:
-				s = context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(StatKeys.DateFirstDeck.toString(), "");
+			case FirstDeck:
+				s = context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(StatKeys.FirstDeck.toString(), "");
 				break;
 			case DateSinceLastDeck:
 				s = context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(StatKeys.DateSinceLastDeck.toString(), "");
@@ -130,9 +130,13 @@ public class PersistentStorage {
 					val = Integer.parseInt(fromStorage) + 1;
 					context.getSharedPreferences(STORAGE_STATS_DECK1, 0).edit().putString(key.toString(), val + "").commit();
 					break;
-				case DateFirstDeck:
-					fromStorage = context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(StatKeys.DateFirstDeck.toString(), "");
-					context.getSharedPreferences(STORAGE_STATS_DECK1, 0).edit().putString(key.toString(), fromStorage).commit();
+				case FirstDeck:
+					fromStorage = context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(StatKeys.FirstDeck.toString(), "");
+					if (fromStorage.equalsIgnoreCase("")) 
+					{
+						data = makeWorkoutStringForStorage(deck);
+						context.getSharedPreferences(STORAGE_STATS_DECK1, 0).edit().putString(key.toString(), data).commit();
+					}
 					break;
 				case DateSinceLastDeck: // TODO: implement this
 					fromStorage = context.getSharedPreferences(STORAGE_STATS_DECK1, 0).getString(StatKeys.DateSinceLastDeck.toString(), "");
