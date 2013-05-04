@@ -12,8 +12,9 @@ public class DuoDeckMessage {
 	Properties properties = new Properties();
 	
 	public static DuoDeckMessage create(String name, String value) {
-		DuoDeckMessage duoDeckMsg = new DuoDeckMessage();
-		duoDeckMsg.properties.put(name, value);
+		DuoDeckMessage duoDeckMsg = new DuoDeckMessage()
+								.put(MessageKey.MessageType, name)
+								.put(name, value);
 		return duoDeckMsg;
 	}
 	
@@ -39,6 +40,10 @@ public class DuoDeckMessage {
 	public static DuoDeckMessage fromMessageString(String msg) throws IOException {
 		DuoDeckMessage prop = new DuoDeckMessage();
 		prop.properties.load(new StringReader(msg));
+		System.out.println("Type: " + prop.getType());
+		
+		System.out.println("To: " + prop.properties.getProperty("Invite"));
+		System.out.println("From: " + prop.properties.getProperty("User"));
 		return prop;
 	}
 	

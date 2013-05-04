@@ -9,6 +9,7 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
@@ -22,6 +23,7 @@ import android.accounts.AccountManager;
 import android.content.Context;
 
 import com.duodeck.workout.DuoDeckApplication;
+import com.duodeck.workout.GameStates;
 
 public class DuoDeckConnectionManager implements MessageListener, ChatManagerListener {
 
@@ -142,6 +144,16 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	private void registerForRosterUpdates() {
 		if (xmppConnection != null) {
 			Roster roster = xmppConnection.getRoster();
+			Presence p;
+			for (RosterEntry entry : roster.getEntries()) {
+				p = roster.getPresence(entry.getUser());
+				String JID = p.getFrom();
+				String user = StringUtils.parseResource(JID);
+				System.out.println("Got " + JID + " with " + p.getType());
+				if (p.getType() == Presence.Type.available && user.contains("duo-deck")) 
+					((DuoDeckApplication) appContext).updateContactList(JID, user);
+			}
+			
 			roster.addRosterListener(new RosterListener() {
 
 				@Override
@@ -160,8 +172,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					String JID = presence.getFrom();
 					String user = StringUtils.parseName(JID);
 					String resource = StringUtils.parseResource(JID);
-					// change the resource from gmail to duo-deck after debugging
-					if (resource.contains("gmail") && presence.toString().equals("available")){ 
+					if (resource.contains("duo-deck") && presence.toString().equals("available")){ 
 						((DuoDeckApplication) appContext).updateContactList(JID, user);
 						System.out.println("JID: " + JID + " , user: " + user);
 						listener.getRosterResponse();
@@ -172,46 +183,74 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		}
 	}
 	
-	public void acceptInvite() throws IOException, XMPPException {
-		DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.TRUE.toString()).send(session);
-	}
-	
-	public void declineInvite() throws IOException, XMPPException {
-		DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString()).send(session);
+	public void cleanupSession() {
 		if (session != null) {
 			session.close(this);
-			session = null;
+		}
+		session = null;
+		((DuoDeckApplication) appContext).setCurrentGameState(GameStates.Solo);
+	}
+	
+	public void acceptInvite(){
+		try {
+			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.TRUE.toString()).send(session);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			this.cleanupSession();
+			errorReported(e);
 		}
 	}
 	
-	public void inviteBuddy(String buddyName) throws IOException, XMPPException {
-		if (session != null){
-			if (session.getBuddyName().equals(buddyName)) {
-				session.sendInvite();
-				return;
-			}
-			else
-				session.close(this);
+	public void declineInvite() {
+		try {
+			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString()).send(session);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XMPPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		Chat c = xmppConnection.getChatManager().createChat(buddyName, APP_CHAT_RESOURCE, this);
-		session = new DuoDeckSession(c, this.username, buddyName);
-		session.sendInvite();
+		this.cleanupSession();
+	}
+	
+	public void inviteBuddy(String buddyName) {
+		try {
+			if (session != null){
+				if (session.getBuddyName().equals(buddyName)) {
+					System.out.println("Invite sent inside if");
+					session.sendInvite();
+					return;
+				}
+				else
+					session.close(this);
+			}
+			Chat c = xmppConnection.getChatManager().createChat(buddyName, APP_CHAT_RESOURCE, this);
+			session = new DuoDeckSession(c, this.username, buddyName, this);
+			session.sendInvite();
+			System.out.println("Invite sent");
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.cleanupSession();
+			errorReported(e);
+		}
 	}
 	
 	@Override
 	public void chatCreated(Chat chat, boolean createdLocal) {
 		// TODO Auto-generated method stub
 		
-		if (!createdLocal) {
+		if (!createdLocal) { 
 			if (session == null) {
-				session = new DuoDeckSession(chat, username, chat.getParticipant());
+				session = new DuoDeckSession(chat, username, chat.getParticipant(), this);
 				chat.addMessageListener(this);
 				System.out.println("Chat session created with " + chat.getParticipant());
 			} else if (chat.getThreadID().contains(APP_CHAT_RESOURCE)){
 				System.out.println("Sorry, we are alreay in a workout session");
-				DuoDeckSession temp = new DuoDeckSession(chat, username, chat.getParticipant());
+				DuoDeckSession temp = new DuoDeckSession(chat, username, chat.getParticipant(), this);
 				try {
-					// we are already in a workout session, so decline invite
+					// we are already in a work-out session, so decline invite
 					DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString())
 								  .send(temp);
 				} catch (IOException e) {
@@ -223,27 +262,30 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				} 
 				temp = null;
 			}
-		}
+		} 
+		System.out.println("New chat session created");
 	}
 
 	@Override
 	public synchronized void processMessage(Chat chat, Message message) {
 		// TODO Auto-generated method stub
+		System.out.println("Inside processMessage: " + message + " and " + message.getBody());
 		if (listener != null) {
 			try {
 				DuoDeckMessage properties = DuoDeckMessage.fromMessageString(message.getBody());
 				switch(properties.getType()) {
 				case Invite:
+					System.out.println("Invite: " + message.getBody());
 					this.notifyInvite(properties);
+					((DuoDeckApplication) appContext).setCurrentGameState(GameStates.BuddyInviting);
 					break;
 				case InviteResponse:
-					String user = properties.getProperty(DuoDeckMessage.MessageKey.User);
+					System.out.println("Invite Response: " + message.getBody());
 					boolean accepted = properties.getBooleanProperty(DuoDeckMessage.MessageKey.Response);
 					if (!accepted) {
-						session.buddyDeclined(user);
-						session.close(this);
+						cleanupSession();
 					} else {
-						session.buddyAccepted(user);
+						((DuoDeckApplication) appContext).setCurrentGameState(GameStates.StartingDuoPlayAsSender);
 					}
 					break;
 				case SendShuffledDeck:
@@ -266,12 +308,19 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	private void notifyInvite(DuoDeckMessage prop) {
 		String fromJID = prop.getProperty(DuoDeckMessage.MessageKey.User);
 		System.out.println("Received invite from: " + fromJID);
-		if (listener != null)
+		if (listener != null) {
 			listener.invite(StringUtils.parseName(fromJID));
+		} else {
+			this.declineInvite();
+		}
+	}
+	
+	public void errorReported(Exception e) {
+		this.listener.errorReported(e);
 	}
 	
 	public static void close() {
-		//make sure to call this method at the end of the workout completion
+		//make sure to call this method at the end of the work-out completion
 		if (isInitiated()) {
 			instance.disconnect();
 			instance.xmppConnection = null;

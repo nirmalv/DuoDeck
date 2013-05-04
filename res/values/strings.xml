@@ -20,5 +20,9 @@
     <string name="title_activity_game">Game (solo or duo)</string>
     <string name="goto_stats">Stats</string>
     <string name="wwb_default_label">Online Buddies</string>
+    <string name="title_activity_invite_from_buddy">Invite From Buddy</string>
+    <string name="invite_default">BUDDY invited you for a workout in Duo Deck App</string>
+    <string name="invite_accept_button">Accept</string>
+    <string name="invite_decline_button">Decline</string>
 
 </resources>

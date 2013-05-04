@@ -5,6 +5,8 @@ public enum GameStates {
 	Solo,
 	MeInviting,
 	BuddyInviting,
+	StartingDuoPlayAsSender,
+	StartingDuoPlayAsReceiver,
 	BothWorkingOut,
 	MeWaitingBuddyWorkingOut,
 	MeWorkingOutBuddyWaiting,

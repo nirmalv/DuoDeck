@@ -1,8 +1,10 @@
 package com.duodeck.workout;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import android.app.Application;
 import android.content.Intent;
@@ -17,6 +19,8 @@ public class DuoDeckApplication extends Application {
 	public static final String ACCOUNT_TOKEN = "oauth_token";
 	public static final String USER_STATUS = "offline";
 	public static final String FULL_JID = "full_jid";
+	
+	public static int[] shuffledOrder;
 	
 	private String username;
 	private String token;
@@ -101,11 +105,11 @@ public class DuoDeckApplication extends Application {
 		this.isConnected = isConnected;
 	}
 
-	public GameStates getCurrentGameState() {
+	public synchronized GameStates getCurrentGameState() {
 		return currentGameState;
 	}
 
-	public void setCurrentGameState(GameStates currentState) {
+	public synchronized void setCurrentGameState(GameStates currentState) {
 		this.currentGameState = currentState;
 	}
 
@@ -127,6 +131,16 @@ public class DuoDeckApplication extends Application {
 	
 	public void updateContactList(String JID, String user) {
 		this.contactList.put(JID, user);
+	}
+	
+	public String getBuddyAtIndex(int index) {
+		int i = 0;
+		for (String JID : this.contactList.keySet()) {
+			if (index == i)
+				return JID;
+			i++;
+		}
+		return null;
 	}
 	
 	public PersistentStorage getPersistentStorage() {

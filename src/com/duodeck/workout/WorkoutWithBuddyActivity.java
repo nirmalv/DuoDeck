@@ -124,14 +124,15 @@ public class WorkoutWithBuddyActivity extends Activity {
 			}
 			
 		});
-		
-		this.getAuthToken(accSelected, false);
+		if (accSelected != null)
+			this.getAuthToken(accSelected, false);
 	}
 	
 	@Override
 	public void onPause() {
 		super.onPause();
-		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
+		//revisit this
+		//sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
 		unbindService(mConnection);
 	}
 	
@@ -150,6 +151,10 @@ public class WorkoutWithBuddyActivity extends Activity {
 	}
 	
 	private void chooseAccount(final Account[] accounts) {
+		if (accounts.length == 0) {
+			labelDisplay.setText("Please add a gmail account in the device to workout with buddies");
+			return;
+		}
 		String[] accNames = new String[accounts.length];
 		for (int i = 0; i < accounts.length; i++) 
 			accNames[i] = accounts[i].name;
@@ -161,6 +166,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 				public void onClick(DialogInterface dialog, int which) {
 					duoDeckApp.setUsername(accounts[which].name);
 					accSelected = accounts[which];
+					getAuthToken(accSelected, false);
 				}
 			});
 		AlertDialog dialog = builder.create();
@@ -183,6 +189,16 @@ public class WorkoutWithBuddyActivity extends Activity {
 							bundle = future.getResult();
 							String authtoken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
 							duoDeckApp.setAuthToken(authtoken);
+							for (int i = 0; i < 10; i++) {
+								if (mService == null)
+									try {
+										Thread.sleep(500);
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								else break;
+							}
 							sendMsgToService(DuoDeckService.MSG_LOGIN,1,1);
 							System.out.println("Done calling MSG_LOGIN");
 						} catch (OperationCanceledException e) {

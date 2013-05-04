@@ -1,6 +1,8 @@
 package com.duodeck.workout.service;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
@@ -10,12 +12,37 @@ public class DuoDeckSession {
 	private Chat chat;
 	private String myName;
 	private String buddyName;
-	private boolean accepted;
+	DuoDeckConnectionManager holder;
 	
-	public DuoDeckSession(Chat chat, String myName, String buddyName) {
+	DuoDeckMessage failureMessageBuffer;
+	int failureAttempt = 0;
+	
+	Timer t;  
+	TimerTask retryFailure = new TimerTask() {
+		@Override
+		public void run() {
+			if (failureAttempt >= 6) {
+				if (t!=null) {t.cancel(); t = null;}
+				holder.errorReported(new XMPPException("Retry attempts exeeded"));
+			} else if (failureMessageBuffer != null) {
+				try {
+					sendMessage(failureMessageBuffer);
+				} catch (Exception e) {
+					e.printStackTrace();
+					failureAttempt++;
+				} 
+			} else {
+				failureAttempt = 0;
+				if (t!=null) {t.cancel(); t = null;}
+			}
+		}
+	};
+	
+	public DuoDeckSession(Chat chat, String myName, String buddyName, DuoDeckConnectionManager holder) {
 		this.chat = chat;
 		this.myName = myName;
-		this.buddyName = buddyName;
+		this.buddyName = buddyName; 
+		this.holder = holder;
 	}
 	
 	public void sendInvite() throws IOException, XMPPException {
@@ -24,11 +51,30 @@ public class DuoDeckSession {
 	}
 	
 	public void sendMessage(DuoDeckMessage message) throws XMPPException, IOException {
-		sendMessage(message.put(DuoDeckMessage.MessageKey.User, myName).toMessageString());
+		try {
+			if (failureMessageBuffer != null && !failureMessageBuffer.equals(message)) { // the last message got through
+				failureMessageBuffer = null; failureAttempt = 0; 
+				if (t != null) {
+					t.cancel();
+					t = null;
+				}
+			} 
+			sendMessage(message.put(DuoDeckMessage.MessageKey.User, myName).toMessageString());
+		} catch (XMPPException e) {
+			if (t == null) {
+				failureMessageBuffer = message;
+				t = new Timer();
+				t.scheduleAtFixedRate(retryFailure, 10000, 10000);
+			} else
+				throw e;
+		}
 	}
 	
 	public void sendMessage(String message) throws XMPPException {
 		chat.sendMessage(message);
+		failureMessageBuffer = null;
+		failureAttempt = 0;
+		if (t!=null) {t.cancel(); t = null;}
 	}
 	
 	public String getBuddyName() {
@@ -39,18 +85,10 @@ public class DuoDeckSession {
 		return myName;
 	}
 	
-	public void buddyAccepted(String user) {
-		if (buddyName.equals(buddyName))
-			accepted = true;
-	}
-	
-	public void buddyDeclined(String user) {
-		if (buddyName.equals(buddyName)) 
-			accepted = false;
-	}
-	
 	public void close(DuoDeckConnectionManager conn) {
 		if (conn != null)
 			chat.removeMessageListener(conn);
 	}
+	
+	
 }
