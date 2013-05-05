@@ -51,6 +51,7 @@ public class InviteFromBuddy extends Activity {
 	}
 	
 	public void acceptInvite(View view) {
+		System.out.println("Creating msg in accept");
 		Message msg = Message.obtain(null, DuoDeckService.MSG_INVITE_RESPONSE, 1, 1);
 		try {
 			mService.send(msg);

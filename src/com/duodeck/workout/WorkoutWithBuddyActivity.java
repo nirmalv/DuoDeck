@@ -9,6 +9,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -28,6 +29,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.duodeck.R;
 
@@ -63,6 +65,10 @@ public class WorkoutWithBuddyActivity extends Activity {
 				break;
 			case DuoDeckService.MSG_GET_ROSTER:
 				displayRoster();
+				break;
+			case DuoDeckService.MSG_INVITE_RESPONSE:
+				System.out.println("Received invite response from service");
+				actOnInviteResponse(msg.arg1);
 				break;
 			default:
 				super.handleMessage(msg);
@@ -133,7 +139,8 @@ public class WorkoutWithBuddyActivity extends Activity {
 		super.onPause();
 		//revisit this
 		//sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
-		unbindService(mConnection);
+		if (mService != null)
+			unbindService(mConnection);
 	}
 	
 	private void sendMsgToService(int type, int arg1, int arg2) {
@@ -222,6 +229,19 @@ public class WorkoutWithBuddyActivity extends Activity {
 			labelDisplay.setText("No contacts available online");
 		else 
 			labelDisplay.setText("Online Buddies");
-		
+	}
+	
+	@SuppressLint("ShowToast")
+	private void actOnInviteResponse(int success) {
+		System.out.println("Inside act on invite response: " + success);
+		String buddy = "";
+		if (accSelected != null)
+			buddy = accSelected.name;
+		if (success == 0) {
+			Toast.makeText(this, buddy + " requested for a different time", Toast.LENGTH_LONG).show();
+		} else {
+			Intent intent = new Intent(this, GameActivity.class);
+			startActivity(intent);
+		}
 	}
 }

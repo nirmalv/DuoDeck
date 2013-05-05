@@ -12,6 +12,7 @@ public class DuoDeckSession {
 	private Chat chat;
 	private String myName;
 	private String buddyName;
+	private boolean accepted;
 	DuoDeckConnectionManager holder;
 	
 	DuoDeckMessage failureMessageBuffer;
@@ -88,6 +89,14 @@ public class DuoDeckSession {
 	public void close(DuoDeckConnectionManager conn) {
 		if (conn != null)
 			chat.removeMessageListener(conn);
+	}
+
+	public boolean isAccepted() {
+		return accepted;
+	}
+
+	public void setAccepted(boolean accepted) {
+		this.accepted = accepted;
 	}
 	
 	

@@ -1,5 +1,9 @@
 package com.duodeck.workout;
 
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,7 +15,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 
 import com.duodeck.workout.service.DuoDeckConnectionListener;
 import com.duodeck.workout.service.DuoDeckConnectionManager;
@@ -27,8 +30,9 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	public static final int MSG_SEND_SHUFFLED_ORDER = 7;
 	public static final int MSG_SHUFFLED_ORDER_RESPONSE = 8;
 	public static final int MSG_DONE_WITH_CARD_INDEX = 9;
+	public static final int MSG_SESSION_TIMEOUT = 10;
 	
-	public static final int DUODECK_NOTIFICATION_ID = 0;
+	public static final int DUODECK_NOTIFICATION_ID = 100;
 	
 	private DuoDeckApplication duoDeckApp;
 	private Messenger sClient;
@@ -111,6 +115,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		duoDeckApp = (DuoDeckApplication) getApplication();
 		duoDeckApp.setServiceRunning(true);
 		sNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		t.scheduleAtFixedRate(sessionTimeout, 60000, 60000);
 	}
 	
 	@Override
@@ -128,38 +133,36 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	@Override
 	public void onDestroy() {
 		//disconnect XMPP stream
+		System.out.println("Stopping service");
 		duoDeckApp.setServiceRunning(false);
 		sNotificationManager.cancelAll();
+		t.cancel();
 		super.onDestroy();
 	}
 	
 	public void sendNotification(String user) {
-		NotificationCompat.Builder notifi_builder = new NotificationCompat.Builder(this)
-						  .setContentText("DuoDeck Workout")
-						  .setContentText(user + " inviting you work for workout session");
+		
 		Intent inviteResponse = new Intent(this, InviteFromBuddy.class);
 		inviteResponse.putExtra("fromUser", user);
-		inviteResponse.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		/*TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-		stackBuilder.addParentStack(LandingScreenActivity.class);
-		stackBuilder.addNextIntent(inviteResponse);
-		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);*/
 		
-		PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, inviteResponse, 0);
+		PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, inviteResponse, PendingIntent.FLAG_UPDATE_CURRENT);
 		System.out.println("Created pending intent");
 		
-		notifi_builder.setContentIntent(resultPendingIntent);
+		NotificationCompat.Builder notifi_builder = new NotificationCompat.Builder(this);
+		notifi_builder.setContentIntent(resultPendingIntent)
+					  .setContentTitle("DuoDeck Workout")
+					  .setContentText(user + " inviting for a workout session")
+					  .setSmallIcon(R.drawable.ic_launcher);
+		
 		Notification notification = notifi_builder.build();
-		//notification.defaults |= Notification.DEFAULT_VIBRATE;
-		//notification.ledARGB = 0xff0000ff;
-		//notification.ledOnMS = 1000;
-		//notification.ledOffMS = 1000;
+		
+		notification.defaults |= Notification.DEFAULT_VIBRATE;
+		notification.ledARGB = 0xff0000ff;
+		notification.ledOnMS = 1000;
+		notification.ledOffMS = 1000;
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		sNotificationManager.notify(DUODECK_NOTIFICATION_ID, notification);
 		System.out.println("Notified");
-		System.out.println("Sending response inside if");
-		duoDeckApp.setCurrentGameState(GameStates.StartingDuoPlayAsReceiver);
-		duoDeckConnection.acceptInvite();
 	}
 	
 	public void deleteNotification() {
@@ -212,8 +215,11 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 
 	@Override
 	public void inviteResponse(String fromJID, boolean accepted) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Sending invite response back to Activity : " + accepted);
+		if (accepted) 
+			sendMsgToClient(MSG_INVITE_RESPONSE, 1, 1);
+		else
+			sendMsgToClient(MSG_INVITE_RESPONSE, 0, 0);
 	}
 
 
@@ -239,5 +245,49 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		// TODO Auto-generated method stub
 		
 	}
+	
+	Timer t = new Timer();
+	TimerTask sessionTimeout = new TimerTask() {
+
+		@Override
+		public void run() {
+			GameStates currentState = duoDeckApp.getCurrentGameState();
+			Date currentTime = new Date(System.currentTimeMillis());
+			Date inviteTime = duoDeckApp.getInviteStartTime();
+			Date sessionTime = duoDeckApp.getSessionLastMsgTime();
+			int inviteElapse = 0;
+			int sessionElapse = 0;
+			if (inviteTime != null)
+				inviteElapse = (int) ((currentTime.getTime() - inviteTime.getTime()) / 1000);
+			if (sessionTime != null)
+				sessionElapse = (int) ((currentTime.getTime() - sessionTime.getTime()) / 1000);
+			System.out.println("Inside timer with " + inviteElapse + " and " + sessionElapse + " and state: " + currentState);
+			System.out.println("Invite time:" + inviteTime);
+			System.out.println("session time:" + sessionTime);
+			switch(currentState) {
+			case MeInviting:
+				if (inviteElapse > 60) {
+					System.out.println("Expiring invite session");
+					duoDeckConnection.cleanupSession();
+					sendMsgToClient(MSG_INVITE_RESPONSE, 0, 1);
+				}
+				break;
+			case BuddyInviting:
+				if (inviteElapse > 60) { // provide this as a settings edit-able
+					System.out.println("Expiring buddy invite session");
+					duoDeckConnection.declineInvite();
+					deleteNotification();
+				}
+				break;
+			default:
+				if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
+					System.out.println("Expiring workout session");
+					duoDeckConnection.cleanupSession();
+					sendMsgToClient(MSG_SESSION_TIMEOUT, 0, 0);
+				}
+				break;
+			}
+		}
+	};
 	
 }

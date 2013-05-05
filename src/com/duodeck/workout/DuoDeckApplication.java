@@ -1,10 +1,9 @@
 package com.duodeck.workout;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 import android.app.Application;
 import android.content.Intent;
@@ -33,6 +32,9 @@ public class DuoDeckApplication extends Application {
 	private SharedPreferences settings;
 
 	private PersistentStorage ps;
+	
+	private Date inviteStartTime = null;
+	private Date sessionLastMsgTime = null;
 	
 	/**
 	 * Constructor
@@ -145,6 +147,22 @@ public class DuoDeckApplication extends Application {
 	
 	public PersistentStorage getPersistentStorage() {
 		return ps;
+	}
+
+	public synchronized Date getInviteStartTime() {
+		return inviteStartTime;
+	}
+
+	public synchronized void setInviteStartTime(Date inviteStartTime) {
+		this.inviteStartTime = inviteStartTime;
+	}
+
+	public synchronized Date getSessionLastMsgTime() {
+		return sessionLastMsgTime;
+	}
+
+	public synchronized void setSessionLastMsgTime(Date sessionLastMsgTime) {
+		this.sessionLastMsgTime = sessionLastMsgTime;
 	}
 	
 }

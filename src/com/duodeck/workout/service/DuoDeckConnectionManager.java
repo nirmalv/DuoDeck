@@ -2,6 +2,7 @@ package com.duodeck.workout.service;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
@@ -148,9 +149,10 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			for (RosterEntry entry : roster.getEntries()) {
 				p = roster.getPresence(entry.getUser());
 				String JID = p.getFrom();
-				String user = StringUtils.parseResource(JID);
+				String user = StringUtils.parseName(JID);
+				String resource = StringUtils.parseResource(JID);
 				System.out.println("Got " + JID + " with " + p.getType());
-				if (p.getType() == Presence.Type.available && user.contains("duo-deck")) 
+				if (resource.contains("duo-deck")) 
 					((DuoDeckApplication) appContext).updateContactList(JID, user);
 			}
 			
@@ -172,7 +174,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					String JID = presence.getFrom();
 					String user = StringUtils.parseName(JID);
 					String resource = StringUtils.parseResource(JID);
-					if (resource.contains("duo-deck") && presence.toString().equals("available")){ 
+					if (resource.contains("duo-deck")){ 
 						((DuoDeckApplication) appContext).updateContactList(JID, user);
 						System.out.println("JID: " + JID + " , user: " + user);
 						listener.getRosterResponse();
@@ -185,9 +187,12 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void cleanupSession() {
 		if (session != null) {
+			System.out.println("Cleaning up session between " + session.getMyName() + " and " + session.getBuddyName());
 			session.close(this);
 		}
 		session = null;
+		((DuoDeckApplication) appContext).setInviteStartTime(null);
+		((DuoDeckApplication) appContext).setSessionLastMsgTime(null);
 		((DuoDeckApplication) appContext).setCurrentGameState(GameStates.Solo);
 	}
 	
@@ -217,6 +222,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void inviteBuddy(String buddyName) {
 		try {
+			((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
 			if (session != null){
 				if (session.getBuddyName().equals(buddyName)) {
 					System.out.println("Invite sent inside if");
@@ -242,13 +248,15 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		// TODO Auto-generated method stub
 		
 		if (!createdLocal) { 
-			if (session == null) {
-				session = new DuoDeckSession(chat, username, chat.getParticipant(), this);
+			String buddyName = StringUtils.parseName(chat.getParticipant());
+			if (session == null || StringUtils.parseName(session.getBuddyName()).equals(buddyName)) {
+				if (session != null) session.close(this);
+				session = new DuoDeckSession(chat, username, buddyName, this);
 				chat.addMessageListener(this);
-				System.out.println("Chat session created with " + chat.getParticipant());
+				System.out.println("Chat session created with " + buddyName);
 			} else if (chat.getThreadID().contains(APP_CHAT_RESOURCE)){
 				System.out.println("Sorry, we are alreay in a workout session");
-				DuoDeckSession temp = new DuoDeckSession(chat, username, chat.getParticipant(), this);
+				DuoDeckSession temp = new DuoDeckSession(chat, username, buddyName, this);
 				try {
 					// we are already in a work-out session, so decline invite
 					DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString())
@@ -271,20 +279,24 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		// TODO Auto-generated method stub
 		System.out.println("Inside processMessage: " + message + " and " + message.getBody());
 		if (listener != null) {
+			((DuoDeckApplication) appContext).setSessionLastMsgTime(new Date(System.currentTimeMillis()));
 			try {
 				DuoDeckMessage properties = DuoDeckMessage.fromMessageString(message.getBody());
 				switch(properties.getType()) {
 				case Invite:
 					System.out.println("Invite: " + message.getBody());
+					((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
 					this.notifyInvite(properties);
 					((DuoDeckApplication) appContext).setCurrentGameState(GameStates.BuddyInviting);
 					break;
 				case InviteResponse:
 					System.out.println("Invite Response: " + message.getBody());
 					boolean accepted = properties.getBooleanProperty(DuoDeckMessage.MessageKey.Response);
+					this.listener.inviteResponse(chat.getParticipant(), accepted);
 					if (!accepted) {
 						cleanupSession();
 					} else {
+						((DuoDeckApplication) appContext).setInviteStartTime(null);
 						((DuoDeckApplication) appContext).setCurrentGameState(GameStates.StartingDuoPlayAsSender);
 					}
 					break;
