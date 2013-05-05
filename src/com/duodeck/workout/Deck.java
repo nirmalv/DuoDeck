@@ -1,6 +1,7 @@
 package com.duodeck.workout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import com.duodeck.workout.TrackStatsWhilePlaying.InGameStatsBySuit;
@@ -12,7 +13,8 @@ import com.duodeck.workout.TrackStatsWhilePlaying.InGameStatsBySuit;
 public class Deck {
 	private ArrayList<Card> cards;
 	private int deckSize = 52; // initialize it to expected value, then set dynamically after building the deck
-
+	private int[] order;
+	
 	private Card finishedCard = new Card(-1, -1);
 
 	public String name = "Deck1";
@@ -26,10 +28,15 @@ public class Deck {
 	
 	Deck()
 	{
+		populateDeck();
+		createCardOrder();
+		shuffleOrder();
+		setOrderToMatch(order);
+	}
+
+	private void populateDeck() 
+	{
 		cards = new ArrayList<Card>();
-		int index_1, index_2;
-		Random generator = new Random();
-		Card temp;
 
 		// TODO: dynamically set the size of the suits based on the card's available suits
 		for (int a=0; a<=3; a++)
@@ -41,8 +48,15 @@ public class Deck {
 			   cards.add( new Card(a,b) );
 			}
 		}
-
-
+		deckSize = cards.size();
+	}
+	
+	private void shuffle() // should not be used
+	{
+		int index_1, index_2;
+		Random generator = new Random();
+		Card temp;
+		
 		for (int i=0; i<100; i++)
 		{
 			index_1 = generator.nextInt( cards.size() - 1 );
@@ -52,8 +66,63 @@ public class Deck {
 			cards.set( index_2 , cards.get( index_1 ) );
 			cards.set( index_1, temp );
 		}
+	}
+	private void createCardOrder() 
+	{
+		order = new int[cards.size()];
+		for (int i=0; i<cards.size(); i++) 
+		{
+			order[i] = i;
+		}
+	}
+	public void setOrderToMatch(int[] targetOrder)
+	{	
+		// requires starting deck in a predictable order
+		// create new fresh deck with predictable order (and ALL cards)
+		populateDeck();
+		createCardOrder();
 		
-		deckSize = cards.size();
+		ArrayList<Card> tempDeckWithPerfectOrder = (ArrayList<Card>) cards.clone();
+		
+		// note that targetOrder may be smaller than order
+		for (int i=0; i<order.length; i++)
+		{
+//			System.out.println("order.length: " + order.length + "\t i: " + i + "\t order[i]: " + order[i] + "\t cards.get(i)" + cards.get(i));
+//			System.out.println("targO.length: " + targetOrder.length + "\t i: " + i + "\t targetOrder[i]: " + order[i] + "\t cards.get(targetOrder[i])" + cards.get(targetOrder[i]));
+			// TODO: handle different sized decks!
+			if (i < targetOrder.length) 
+			{
+				cards.set(targetOrder[i], tempDeckWithPerfectOrder.get(i));
+			} else {
+				// TODO: remove unused cards
+				cards.remove(i);
+			}
+		}	
+
+		tempDeckWithPerfectOrder.clear();
+		
+		// set order to match incoming order
+		order = targetOrder;
+	}
+	public void shuffleOrder() // !
+	{
+		int index_1, index_2;
+		Random generator = new Random();
+		int temp;
+		
+		for (int i=0; i<100; i++)
+		{
+			index_1 = generator.nextInt( order.length - 1 );
+			index_2 = generator.nextInt( order.length - 1 );
+
+			temp = order[ index_2 ];
+			order[ index_2 ] = order[ index_1 ];
+			order[ index_1 ] =  temp;
+		}
+	}
+	public int[] getOrder() 
+	{
+		return order;
 	}
 	
 	public String showDeck()
@@ -72,6 +141,7 @@ public class Deck {
 	{	   
 		if (cards.size() > 0) 
 		{
+			order = Arrays.copyOfRange(order, 1, order.length);
 			return cards.remove( 0 );
 		} else {
 			return finishedCard;

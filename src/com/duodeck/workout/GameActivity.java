@@ -22,7 +22,7 @@ public class GameActivity extends Activity {
 	// TODO: get game state
 	public GameStates currentGameState = GameStates.Solo;
 	
-	public Deck deck = new Deck();
+	public Deck deck;
 	public Card currentCard;
 	
 	// chronometer
@@ -36,6 +36,8 @@ public class GameActivity extends Activity {
     	duoDeckApp = (DuoDeckApplication) getApplication();
     	ps = duoDeckApp.getPersistentStorage();
 		
+    	deck = new Deck();
+    	
 		setContentView(R.layout.solo_deck);
 
 		startChronometer(null);
@@ -105,7 +107,7 @@ public class GameActivity extends Activity {
 					// remove the card from the deck of available options
 					// display the next card
 					// TODO: remove the following line
-					System.out.println("done with this card");
+//					System.out.println("done with this card");
 		
 					TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
 					deckInfo.setText(deck.showDeck());
@@ -139,7 +141,7 @@ public class GameActivity extends Activity {
 					
 					
 					
-					System.out.println("from STORAGE: " + ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.PreviousDeck));
+//					System.out.println("from STORAGE: " + ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.PreviousDeck));
 					
 					
 					// TODO: record deck stats in stats
