@@ -142,7 +142,7 @@ public class PersistentStorage {
 					CustomDate storageDurationDate = new CustomDate();
 					storageDurationDate.setThisDateToDurationBasedOnString(storageWorkoutAsString);
 					
-//					System.out.println("current: " + storageDurationDate.convertDateToStringTimeOfDay());
+					System.out.println("current: " + storageDurationDate.convertDateToStringTimeOfDay());
 					
 					if (storageDurationDate.isNullDuration()) 
 					{
@@ -152,8 +152,8 @@ public class PersistentStorage {
 						currentDurationDate.setThisDateToDurationBasedOnString(currentWorkoutAsString);
 //						currentDurationDate.setThisDateToDurationBasedOnString(deck.inGameStats.duration);
 						
-//						System.out.println("current: " + deck.inGameStats.duration);
-//						System.out.println("current: " + currentDurationDate.convertDateToStringTimeOfDay() + " ||| storage: " + storageDurationDate.convertDateToStringTimeOfDay());
+						System.out.println("current: " + deck.inGameStats.duration);
+						System.out.println("current: " + currentDurationDate.convertDateToStringTimeOfDay() + " ||| storage: " + storageDurationDate.convertDateToStringTimeOfDay());
 						
 						if (currentDurationDate.before(storageDurationDate))
 						{

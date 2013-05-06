@@ -16,7 +16,7 @@ public class CustomDate extends Date {
 	private SimpleDateFormat dateFormatYMD = new SimpleDateFormat("yyyy/MM/dd");
 	private SimpleDateFormat dateFormatTimeOfDay = new SimpleDateFormat("kk:mm:ss");
 	private SimpleDateFormat dateFormatDuration = new SimpleDateFormat("mm:ss");
-
+	
 	public CustomDate getCurrentDateAsCustomDate() 
 	{
 		return new CustomDate();
@@ -45,14 +45,14 @@ public class CustomDate extends Date {
 			dateString = m.group(1);
 		}
 
-//		System.out.println("date string to parse to date: " + dateString);
+		System.out.println("date string to parse to date: " + dateString);
 		try {
 			long milliseconds = dateFormatDuration.parse(dateString).getTime();
-//			System.out.println("millis: " + milliseconds);
+			System.out.println("millis: " + milliseconds);
 			this.setTime(milliseconds);
 		} catch (ParseException e) {
 			// set to (CustomDate) 0:00
-//			System.out.println("error parsing string to date");
+			System.out.println("error parsing string to date");
 			this.setTime(0);
 		}
 	}
@@ -87,7 +87,10 @@ public class CustomDate extends Date {
 	}
 
 	public boolean isNullDuration() {
-		if (this.getTime() == 0)
+		
+		// TODO: this may break if you change the date format (24h)
+//		System.out.println("this.getTime(): " + this.getTime() + "\t\t nullDate.getTime()" + nullDate.getTime());
+		if (this.getTime() == 18000000)
 		{
 			return true;
 		} else {

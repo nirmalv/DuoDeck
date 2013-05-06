@@ -154,7 +154,7 @@ public class LandingScreenActivity extends Activity {
     };
     public void mGotoStatsFromLanding(View view) {
         System.out.println("goto Stats from Landing");
-    	Intent intent = new Intent(this, ZZ_AndroidStorageActivity.class);
+    	Intent intent = new Intent(this, StatsActivity.class);
     	startActivity(intent);
     };
 
