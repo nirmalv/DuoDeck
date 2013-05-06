@@ -1,8 +1,5 @@
 package com.duodeck.workout;
 
-import com.duodeck.workout.util.SystemUiHider;
-import com.example.duodeck.R;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -11,7 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
+
+import com.duodeck.workout.util.SystemUiHider;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.

@@ -31,8 +31,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.duodeck.R;
-
 public class WorkoutWithBuddyActivity extends Activity {
 
 	private AccountManager accountManager;

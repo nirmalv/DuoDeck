@@ -13,8 +13,6 @@ import android.os.RemoteException;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.duodeck.R;
-
 public class InviteFromBuddy extends Activity {
 
 	TextView inviteLabel;
