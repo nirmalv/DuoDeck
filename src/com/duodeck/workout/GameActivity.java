@@ -1,6 +1,7 @@
 package com.duodeck.workout;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
@@ -17,8 +18,6 @@ public class GameActivity extends Activity {
 	private PersistentStorage ps;
 	
 	private GameStates gameStates;
-	// TODO: load DuoDeckApp
-	// TODO: get context of DuoDeckApp in onCreate
 	// TODO: get game state
 	public GameStates currentGameState = GameStates.Solo;
 	
@@ -55,13 +54,8 @@ public class GameActivity extends Activity {
 	@Override 
 	protected void onPause(){
         super.onPause();
-        
-//        SharedPreferences settings = getSharedPreferences(ps.STORAGE_STATS_DECK1,0);
-//        SharedPreferences.Editor editor = settings.edit();
-//        // Necessary to clear first if we save preferences onPause. 
-//        editor.clear();
-//        editor.putInt("Metric", mMetric);
-//        editor.commit();
+        // do we want to do anything here?
+        // currently not pausing the timer because this is helpful with duodecks
     }
 	
 	
@@ -106,31 +100,26 @@ public class GameActivity extends Activity {
 					// get new card
 					// remove the card from the deck of available options
 					// display the next card
-					// TODO: remove the following line
+					
 //					System.out.println("done with this card");
 		
+					// TODO: remove for final, this is for debugging only
 					TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
 					deckInfo.setText(deck.showDeck());
-					
+
+					// TODO: make the display look nicer
 					TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
 					currentCard = deck.drawFromDeck();
 					displayOfCurrentCard.setText(currentCard + "\t\t" + deck.getCardsRemaining() + "/" + deck.getDeckSize() );
 					
-
-					deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();
-					
-//					String statsAsString = ps.makeWorkoutStringForStorage(deck);
-//					System.out.println("... " + statsAsString);
-					
+					deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();					
 				} else {
 					stopChronometer(null);
 
 //					System.out.println("finished deck");
-					// TODO: record finished time
 					deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();
 					
 					String statsAsString = ps.makeWorkoutStringForStorage(deck);
-//					System.out.println("stats as string: " + statsAsString);
 					ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, statsAsString);
 
 					ps.updateStatsWithNewDeck(GameActivity.this, deck);
@@ -139,12 +128,9 @@ public class GameActivity extends Activity {
 					View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
 					buttonNextCard.setOnClickListener(null);
 					
-					
-					
-//					System.out.println("from STORAGE: " + ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.PreviousDeck));
-					
-					
-					// TODO: record deck stats in stats
+					// show "finished" text and provide button to stats activity
+					View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+					buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
 					
 					
 					
@@ -180,31 +166,29 @@ public class GameActivity extends Activity {
 		}
 	}
 	
-	public void saveData(View view) 
-	{
-//		System.out.println("saving data...");
-		EditText inputText = (EditText) findViewById(R.id.editText1);
-//		TextView responseText = (TextView) findViewById(R.id.textView1);
-//		ps.saveDataToFile(inputText, responseText);
-//		"
-		ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, inputText.getText().toString());
-
-//		System.out.println("saved data.");
-	}
 	
-	public void getData(View view)
-	{
-//		System.out.println("retrieving data...");
-		
-		EditText inputText = (EditText) findViewById(R.id.editText1);
-		TextView responseText = (TextView) findViewById(R.id.textView1);
-		String data = "";
-//		System.out.println(ps.getDataFromInternalStorage(inputText, responseText, data));
 
-		System.out.println(ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.PreviousDeck));
-
-//		System.out.println("retrieved data.");
-	}
+	public void gotoStatsFromGame(View view) {
+//        System.out.println("goto Stats from Game");
+    	Intent intent = new Intent(this, StatsActivity.class);
+    	startActivity(intent);
+	};
+	
+	
+//	public void saveData(View view) 
+//	{
+//		EditText inputText = (EditText) findViewById(R.id.editText1);
+//		ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, inputText.getText().toString());
+//	}
+//	
+//	public void getData(View view)
+//	{
+//		EditText inputText = (EditText) findViewById(R.id.editText1);
+//		TextView responseText = (TextView) findViewById(R.id.textView1);
+//		String data = "";
+//		System.out.println(ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.PreviousDeck));
+//	}
+	
 	
 	
 	/* 

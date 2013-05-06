@@ -49,7 +49,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     public static final class id {
         public static final int Button01=0x7f09001e;
         public static final int Button02=0x7f090018;
-        public static final int action_settings=0x7f090024;
+        public static final int action_settings=0x7f090025;
         public static final int button1=0x7f09001f;
         public static final int button2=0x7f090019;
         public static final int chronoPause=0x7f090021;
@@ -62,12 +62,13 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int fullscreen_content_controls=0x7f09000a;
         public static final int getExternalStorage=0x7f090004;
         public static final int getInternalStorage=0x7f090002;
+        public static final int gotoStatsFromGame=0x7f090023;
         public static final int imgIcon=0x7f090010;
         public static final int invite_accept=0x7f090007;
         public static final int invite_decline=0x7f090008;
         public static final int invite_label=0x7f090006;
         public static final int landing_bottom_button=0x7f09000b;
-        public static final int menu_settings=0x7f090023;
+        public static final int menu_settings=0x7f090024;
         public static final int myInputText=0x7f090000;
         public static final int responseText=0x7f090005;
         public static final int saveExternalStorage=0x7f090003;
@@ -107,6 +108,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int done_with_this_card=0x7f060007;
         public static final int dummy_button=0x7f060002;
         public static final int dummy_content=0x7f060001;
+        public static final int gotoStatsFromGame=0x7f060017;
         public static final int goto_settings=0x7f060004;
         public static final int goto_stats=0x7f060011;
         public static final int hello_world=0x7f06000b;

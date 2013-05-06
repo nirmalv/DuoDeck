@@ -33,6 +33,13 @@ public class Deck {
 		shuffleOrder();
 		setOrderToMatch(order);
 	}
+	
+	Deck(int[] targetOrder)
+	{
+		populateDeck();
+		createCardOrder();
+		setOrderToMatch(targetOrder);
+	}
 
 	private void populateDeck() 
 	{
@@ -94,7 +101,7 @@ public class Deck {
 			{
 				cards.set(targetOrder[i], tempDeckWithPerfectOrder.get(i));
 			} else {
-				// TODO: remove unused cards
+				// remove unused cards
 				cards.remove(i);
 			}
 		}	

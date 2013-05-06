@@ -138,5 +138,15 @@
         android:layout_alignParentRight="true"
         android:onClick="stopChronometer"
         android:text="Stop" />
+
+    <Button
+        android:id="@+id/gotoStatsFromGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/chronoPause"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/gotoStatsFromGame" 
+        android:onClick="gotoStatsFromGame"/>
     
 </RelativeLayout>

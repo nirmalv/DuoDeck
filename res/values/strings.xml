@@ -24,5 +24,6 @@
     <string name="invite_default">BUDDY invited you for a workout in Duo Deck App</string>
     <string name="invite_accept_button">Accept</string>
     <string name="invite_decline_button">Decline</string>
+    <string name="gotoStatsFromGame">Deck complete! See stats.</string>
 
 </resources>

@@ -143,17 +143,17 @@ public class LandingScreenActivity extends Activity {
         }
     };
     public void  mStartSoloDeckFromLanding(View view) {
-        System.out.println("start new SOLO deck");
+//        System.out.println("start new SOLO deck");
 		Intent intent = new Intent(this, GameActivity.class);
 		startActivity(intent);
     };
     public void mStartDuoDeckFromLanding(View view) {
-        System.out.println("start new DUO deck");
+//        System.out.println("start new DUO deck");
     	Intent intent = new Intent(this, WorkoutWithBuddyActivity.class);
     	startActivity(intent);
     };
     public void mGotoStatsFromLanding(View view) {
-        System.out.println("goto Stats from Landing");
+//        System.out.println("goto Stats from Landing");
     	Intent intent = new Intent(this, StatsActivity.class);
     	startActivity(intent);
     };
