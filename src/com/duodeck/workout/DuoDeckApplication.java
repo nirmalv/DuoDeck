@@ -35,6 +35,7 @@ public class DuoDeckApplication extends Application {
 	
 	private Date inviteStartTime = null;
 	private Date sessionLastMsgTime = null;
+	private int[] deckOrder = null;
 	
 	/**
 	 * Constructor
@@ -163,6 +164,14 @@ public class DuoDeckApplication extends Application {
 
 	public synchronized void setSessionLastMsgTime(Date sessionLastMsgTime) {
 		this.sessionLastMsgTime = sessionLastMsgTime;
+	}
+
+	public synchronized int[] getDeckOrder() {
+		return deckOrder;
+	}
+
+	public synchronized void setDeckOrder(int[] deckOrder) {
+		this.deckOrder = deckOrder;
 	}
 	
 }

@@ -1,6 +1,7 @@
 package com.duodeck.workout.service;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
@@ -198,7 +199,9 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void acceptInvite(){
 		try {
-			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.TRUE.toString()).send(session);
+			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, "Yes")
+					.put(DuoDeckMessage.MessageKey.Response, Boolean.TRUE.toString())
+					.send(session);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -209,7 +212,9 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void declineInvite() {
 		try {
-			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString()).send(session);
+			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, "Not right now")
+					.put(DuoDeckMessage.MessageKey.Response, Boolean.FALSE.toString())
+					.send(session);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -222,6 +227,10 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void inviteBuddy(String buddyName) {
 		try {
+			if (((DuoDeckApplication) appContext).getCurrentGameState() == GameStates.BuddyInviting) {
+				System.out.println("there is a notification pending from Buddy");
+				return;
+			}
 			((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
 			if (session != null){
 				if (session.getBuddyName().equals(buddyName)) {
@@ -232,7 +241,12 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				else
 					session.close(this);
 			}
-			Chat c = xmppConnection.getChatManager().createChat(buddyName, APP_CHAT_RESOURCE, this);
+			Chat c;
+			try {
+				c = xmppConnection.getChatManager().createChat(buddyName, APP_CHAT_RESOURCE, this);
+			} catch (IllegalArgumentException e) { // generally there is already a thread id
+				c = xmppConnection.getChatManager().createChat(buddyName, this);
+			}
 			session = new DuoDeckSession(c, this.username, buddyName, this);
 			session.sendInvite();
 			System.out.println("Invite sent");
@@ -241,6 +255,31 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			this.cleanupSession();
 			errorReported(e);
 		}
+	}
+	
+	public void sendShuffledOrder() {
+		int[] deckOrder = ((DuoDeckApplication) appContext).getDeckOrder();
+		if (deckOrder != null) {
+			String deckStr = Arrays.toString(deckOrder);
+			try {
+				DuoDeckMessage.create(DuoDeckMessage.MessageType.SendShuffledDeck, deckStr).send(session);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				this.listener.errorReported(e);
+			}
+				
+		} else {
+			System.out.println("Deckorder is not set yet");
+		}
+	}
+	
+	public void sendShuffledOrderResponse() {
+		
+	}
+	
+	public void doneWithCardIndex(int myIndex, int buddyIndex) {
+		
 	}
 	
 	@Override
@@ -302,13 +341,19 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					break;
 				case SendShuffledDeck:
 					System.out.println("Received shuffled deck");
+					//this.listener.processShuffledDeck(fromJID, duckOrder);
 					break;
 				case ShuffledDeckResponse:
 					System.out.println("Received shuffled deck response");
+					//this.listener.shuffledDeckResponse(fromJID, success);
 					break;
 				case DoneWithCardIndex:
 					System.out.println("Done with Card index");
+					//this.listener.dockWithCardIndex(fromJID, buddyIndex, myIndex);
 					break;
+				case Close:
+					System.out.println("Closing session");
+					cleanupSession();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

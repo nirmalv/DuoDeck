@@ -135,8 +135,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		//revisit this
-		//sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
+		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
 		if (mService != null)
 			unbindService(mConnection);
 	}
@@ -237,7 +236,9 @@ public class WorkoutWithBuddyActivity extends Activity {
 			buddy = accSelected.name;
 		if (success == 0) {
 			Toast.makeText(this, buddy + " requested for a different time", Toast.LENGTH_LONG).show();
+			duoDeckApp.setCurrentGameState(GameStates.Solo);
 		} else {
+			duoDeckApp.setCurrentGameState(GameStates.StartingDuoPlayAsSender);
 			Intent intent = new Intent(this, GameActivity.class);
 			startActivity(intent);
 		}

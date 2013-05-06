@@ -28,9 +28,11 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	public static final int MSG_INVITE = 5;
 	public static final int MSG_INVITE_RESPONSE = 6;
 	public static final int MSG_SEND_SHUFFLED_ORDER = 7;
-	public static final int MSG_SHUFFLED_ORDER_RESPONSE = 8;
-	public static final int MSG_DONE_WITH_CARD_INDEX = 9;
-	public static final int MSG_SESSION_TIMEOUT = 10;
+	public static final int MSG_SEND_SHUFFLED_ORDER_RESPONSE = 8;
+	public static final int MSG_GOT_SHUFFLED_ORDER = 9;
+	public static final int MSG_GOT_SHUFFLED_ORDER_RESPONSE = 10;
+	public static final int MSG_DONE_WITH_CARD_INDEX = 11;
+	public static final int MSG_SESSION_TIMEOUT = 12;
 	
 	public static final int DUODECK_NOTIFICATION_ID = 100;
 	
@@ -48,16 +50,11 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			switch (msg.what) {
 			case MSG_REGISTER:
 				output("Register client");
-				if (sClient == null)
-					sClient = msg.replyTo;
-				else
-					System.out.println("There is already a client registered");
+				sClient = null;
+				sClient = msg.replyTo;
 				break;
 			case MSG_UNREGISTER:
-				if (sClient != null)
-					sClient = null;
-				else
-					System.out.println("No registered client present");
+				sClient = null;
 				output("Unregistering client");
 				break;
 			case MSG_LOGIN:
@@ -84,7 +81,12 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				}
 				break;
 			case MSG_SEND_SHUFFLED_ORDER:
-				
+				duoDeckConnection.sendShuffledOrder();
+				break;
+			case MSG_SEND_SHUFFLED_ORDER_RESPONSE:
+				duoDeckConnection.sendShuffledOrderResponse();
+				break;
+			case MSG_DONE_WITH_CARD_INDEX:
 				break;
 			default:
 				super.handleMessage(msg);
@@ -175,7 +177,8 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	
 	private void sendMsgToClient(int type, int arg1, int arg2) {
 		try {
-			sClient.send(Message.obtain(null, type, arg1, arg2));
+			if (sClient != null) 
+				sClient.send(Message.obtain(null, type, arg1, arg2));
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -225,7 +228,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 
 
 	@Override
-	public void processShuffledDeck(String fromJID) {
+	public void processShuffledDeck(String fromJID, int[] deckOrder) {
 		// TODO Auto-generated method stub
 		
 	}

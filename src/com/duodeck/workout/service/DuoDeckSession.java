@@ -87,6 +87,16 @@ public class DuoDeckSession {
 	}
 	
 	public void close(DuoDeckConnectionManager conn) {
+		try {
+			DuoDeckMessage.create(DuoDeckMessage.MessageType.Close, buddyName)
+			  .send(this);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XMPPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (conn != null)
 			chat.removeMessageListener(conn);
 	}

@@ -17,7 +17,7 @@ public class InviteFromBuddy extends Activity {
 
 	TextView inviteLabel;
 	private Messenger mService = null;
-	
+	DuoDeckApplication duoDeckApp;
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
@@ -40,6 +40,14 @@ public class InviteFromBuddy extends Activity {
 		Bundle extra = getIntent().getExtras();
 		String user = extra.getString("fromUser");
 		inviteLabel.setText(user + " invited you for a workout");
+		duoDeckApp = (DuoDeckApplication) getApplication();
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (mService == null) 
+			bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
 	}
 	
 	@Override
@@ -57,6 +65,7 @@ public class InviteFromBuddy extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		duoDeckApp.setCurrentGameState(GameStates.StartingDuoPlayAsReceiver);
 		Intent intent = new Intent(this, GameActivity.class);
 		startActivity(intent);
 	}
@@ -69,6 +78,7 @@ public class InviteFromBuddy extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		duoDeckApp.setCurrentGameState(GameStates.Solo);
 		Intent intent = new Intent(this, LandingScreenActivity.class);
 		startActivity(intent);
 	}

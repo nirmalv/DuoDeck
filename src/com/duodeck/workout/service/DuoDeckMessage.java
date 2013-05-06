@@ -78,7 +78,7 @@ public class DuoDeckMessage {
 	}
 	
 	public static enum MessageType {
-		Invite, InviteResponse, SendShuffledDeck, ShuffledDeckResponse, DoneWithCardIndex
+		Invite, InviteResponse, SendShuffledDeck, ShuffledDeckResponse, DoneWithCardIndex, Close
 	}
 	
 }
