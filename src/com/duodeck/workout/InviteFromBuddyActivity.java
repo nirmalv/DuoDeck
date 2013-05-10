@@ -13,7 +13,7 @@ import android.os.RemoteException;
 import android.view.View;
 import android.widget.TextView;
 
-public class InviteFromBuddy extends Activity {
+public class InviteFromBuddyActivity extends Activity {
 
 	TextView inviteLabel;
 	private Messenger mService = null;

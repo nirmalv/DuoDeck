@@ -12,7 +12,29 @@ public class PersistentStorage {
 	// TODO: add in decks 2 and 3
 	//	  public static final String STORAGE_STATS_DECK2 = "StatsDeck2";	
 	//    public static final String STORAGE_STATS_DECK3 = "StatsDeck3";
-
+	public static final String ACCOUNT_SETUP = "DuoDeckAccountStorage";
+	
+	public String getUserName(Context context) {
+		return context.getSharedPreferences(ACCOUNT_SETUP, 0).getString("UserName", null);
+	}
+	
+	public void updateUserName(Context context, String username) {
+		context.getSharedPreferences(ACCOUNT_SETUP, 0)
+				.edit()
+				.putString("UserName", username)
+				.commit();
+	}
+	
+	public String getAuthToken(Context context) {
+		return context.getSharedPreferences(ACCOUNT_SETUP, 0).getString("AuthToken", null);
+	}
+	
+	public void updateAuthToken(Context context, String authToken) {
+		context.getSharedPreferences(ACCOUNT_SETUP, 0)
+				.edit()
+				.putString("AuthToken", authToken)
+				.commit();
+	}
     
     // string format (rough idea)
 	// dateStarted:yyyy-mm-dd timeOfDayStarted:hh:mm:ss deckName:string duration:hh:mm s:count,duration h:count,duration d:count,duration c:count,duration map:s=exercise,h=exercise,d=exercise,c=exercise"

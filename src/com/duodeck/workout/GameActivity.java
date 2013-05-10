@@ -47,8 +47,8 @@ public class GameActivity extends Activity {
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
 				startTheWorkout();
 				break;
-			case DuoDeckService.MSG_SESSION_TIMEOUT:
-				informSessionTimeout();
+			case DuoDeckService.MSG_SESSION_CLOSED:
+				informSessionClosed();
 				break;
 			case DuoDeckService.MSG_DONE_WITH_CARD_INDEX:
 				setBuddyCardIndex(msg.arg1, msg.arg2);
@@ -311,7 +311,7 @@ public class GameActivity extends Activity {
 		
 	}
 	
-	private void informSessionTimeout() {
+	private void informSessionClosed() {
 		
 	}
 	

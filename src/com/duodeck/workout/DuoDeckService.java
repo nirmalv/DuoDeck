@@ -32,7 +32,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	public static final int MSG_GOT_SHUFFLED_ORDER = 9;
 	public static final int MSG_GOT_SHUFFLED_ORDER_RESPONSE = 10;
 	public static final int MSG_DONE_WITH_CARD_INDEX = 11;
-	public static final int MSG_SESSION_TIMEOUT = 12;
+	public static final int MSG_SESSION_CLOSED = 12;
 	
 	public static final int DUODECK_NOTIFICATION_ID = 100;
 	
@@ -84,9 +84,11 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				duoDeckConnection.sendShuffledOrder();
 				break;
 			case MSG_SEND_SHUFFLED_ORDER_RESPONSE:
-				duoDeckConnection.sendShuffledOrderResponse();
+				duoDeckConnection.sendShuffledOrderResponse(true);
 				break;
 			case MSG_DONE_WITH_CARD_INDEX:
+				//arg1 is buddyIndex and arg2 is myIndex
+				duoDeckConnection.doneWithCardIndex(msg.arg1, msg.arg2);
 				break;
 			default:
 				super.handleMessage(msg);
@@ -144,7 +146,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	
 	public void sendNotification(String user) {
 		
-		Intent inviteResponse = new Intent(this, InviteFromBuddy.class);
+		Intent inviteResponse = new Intent(this, InviteFromBuddyActivity.class);
 		inviteResponse.putExtra("fromUser", user);
 		
 		PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, inviteResponse, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -214,8 +216,6 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		
 	}
 
-
-
 	@Override
 	public void inviteResponse(String fromJID, boolean accepted) {
 		System.out.println("Sending invite response back to Activity : " + accepted);
@@ -225,28 +225,33 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			sendMsgToClient(MSG_INVITE_RESPONSE, 0, 0);
 	}
 
-
-
 	@Override
-	public void processShuffledDeck(String fromJID, int[] deckOrder) {
-		// TODO Auto-generated method stub
-		
+	public void processShuffledDeck(String fromJID, String deckOrderStr) {
+		String[] items = deckOrderStr.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
+		int[] deckOrder = new int[items.length];
+		for (int i = 0; i < items.length ; i++) {
+			try {
+				deckOrder[i] = Integer.parseInt(items[i]);
+			} catch (NumberFormatException nfe) {
+				this.duoDeckConnection.sendShuffledOrderResponse(false);
+				break;
+			}
+		}
+		duoDeckApp.setDeckOrder(deckOrder);
+		sendMsgToClient(MSG_GOT_SHUFFLED_ORDER, 1, 1);
 	}
-
-
 
 	@Override
 	public void shuffledDeckResponse(String fromJID, boolean success) {
-		// TODO Auto-generated method stub
-		
+		if (success)
+			sendMsgToClient(MSG_GOT_SHUFFLED_ORDER_RESPONSE, 1, 1);
+		else
+			sendMsgToClient(MSG_GOT_SHUFFLED_ORDER_RESPONSE, 0, 0);
 	}
 
-
-
 	@Override
-	public void dockWithCardIndex(String fromJID, int seq, int ackSeq) {
-		// TODO Auto-generated method stub
-		
+	public void dockWithCardIndex(String fromJID, int buddyIndex, int myIndex) {
+		sendMsgToClient(MSG_DONE_WITH_CARD_INDEX, buddyIndex, myIndex);
 	}
 	
 	Timer t = new Timer();
@@ -286,7 +291,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
 					System.out.println("Expiring workout session");
 					duoDeckConnection.cleanupSession();
-					sendMsgToClient(MSG_SESSION_TIMEOUT, 0, 0);
+					sendMsgToClient(MSG_SESSION_CLOSED, 0, 0);
 				}
 				break;
 			}

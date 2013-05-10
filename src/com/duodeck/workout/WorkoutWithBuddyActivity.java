@@ -123,8 +123,20 @@ public class WorkoutWithBuddyActivity extends Activity {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
-				// Here we need to mark the time for timeout check
-				sendMsgToService(DuoDeckService.MSG_INVITE, pos, 1);
+				switch(duoDeckApp.getCurrentGameState()) {
+				case Solo:
+					sendMsgToService(DuoDeckService.MSG_INVITE, pos, 1);
+					break;
+				case MeInviting:
+					Toast.makeText(getBaseContext(), "Please wait 60sec to get response for your previous invite", Toast.LENGTH_LONG);
+					break;
+				case BuddyInviting:
+					Toast.makeText(getBaseContext(), "There is an invite waiting for you in the notification bar", Toast.LENGTH_LONG);
+					break;
+				default:
+					Toast.makeText(getBaseContext(), "You are in the middle of a workout session, complete that first", Toast.LENGTH_LONG);
+					break;
+				}
 			}
 			
 		});

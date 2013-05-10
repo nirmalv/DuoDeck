@@ -57,7 +57,7 @@
         </service>
 
         <activity
-            android:name="com.duodeck.workout.InviteFromBuddy"
+            android:name="com.duodeck.workout.InviteFromBuddyActivity"
             android:label="@string/title_activity_invite_from_buddy" >
         </activity>
     </application>

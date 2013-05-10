@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
+import org.json.*;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.Connection;
@@ -274,12 +276,34 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		}
 	}
 	
-	public void sendShuffledOrderResponse() {
-		
+	public void sendShuffledOrderResponse(boolean success) {
+		try {
+			if (success) {
+				DuoDeckMessage.create(DuoDeckMessage.MessageType.ShuffledDeckResponse, "Yes")
+				.put(DuoDeckMessage.MessageKey.Response, Boolean.TRUE.toString())
+				.send(session);
+			} else {
+				DuoDeckMessage.create(DuoDeckMessage.MessageType.ShuffledDeckResponse, "No")
+				.put(DuoDeckMessage.MessageKey.Response, Boolean.FALSE.toString())
+				.send(session);
+				cleanupSession();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.listener.errorReported(e);
+		}
 	}
 	
-	public void doneWithCardIndex(int myIndex, int buddyIndex) {
-		
+	public void doneWithCardIndex(int buddyIndex, int myIndex) {
+		try {
+			DuoDeckMessage.create(DuoDeckMessage.MessageType.DoneWithCardIndex, "Inform")
+			.put("BuddyIndex", Integer.toString(buddyIndex))
+			.put("MyIndex", Integer.toString(myIndex))
+			.send(session);
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.listener.errorReported(e);
+		}		
 	}
 	
 	@Override
@@ -321,6 +345,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			((DuoDeckApplication) appContext).setSessionLastMsgTime(new Date(System.currentTimeMillis()));
 			try {
 				DuoDeckMessage properties = DuoDeckMessage.fromMessageString(message.getBody());
+				String fromJID = properties.getProperty(DuoDeckMessage.MessageKey.User);
 				switch(properties.getType()) {
 				case Invite:
 					System.out.println("Invite: " + message.getBody());
@@ -341,15 +366,19 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					break;
 				case SendShuffledDeck:
 					System.out.println("Received shuffled deck");
-					//this.listener.processShuffledDeck(fromJID, duckOrder);
+					String deckOrder = properties.getProperty(DuoDeckMessage.MessageType.SendShuffledDeck);
+					this.listener.processShuffledDeck(fromJID, deckOrder);
 					break;
 				case ShuffledDeckResponse:
 					System.out.println("Received shuffled deck response");
-					//this.listener.shuffledDeckResponse(fromJID, success);
+					boolean success = properties.getBooleanProperty(DuoDeckMessage.MessageKey.Response);
+					this.listener.shuffledDeckResponse(fromJID, success);
 					break;
 				case DoneWithCardIndex:
 					System.out.println("Done with Card index");
-					//this.listener.dockWithCardIndex(fromJID, buddyIndex, myIndex);
+					int buddyIndex = Integer.parseInt(properties.getProperty("BuddyIndex"));
+					int myIndex = Integer.parseInt(properties.getProperty("MyIndex"));
+					this.listener.dockWithCardIndex(fromJID, buddyIndex, myIndex);
 					break;
 				case Close:
 					System.out.println("Closing session");

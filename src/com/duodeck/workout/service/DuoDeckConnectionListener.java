@@ -12,10 +12,10 @@ public interface DuoDeckConnectionListener {
 	
 	void inviteResponse(String fromJID, boolean accepted);
 	
-	void processShuffledDeck(String fromJID, int[] duckOrder);
+	void processShuffledDeck(String fromJID, String duckOrder);
 	
 	void shuffledDeckResponse(String fromJID, boolean success);
 	
-	void dockWithCardIndex(String fromJID, int seq, int ackSeq);
+	void dockWithCardIndex(String fromJID, int buddyIndex, int myIndex);
 	
 }

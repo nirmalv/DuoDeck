@@ -55,6 +55,14 @@ public class DuoDeckMessage {
 		return properties.getProperty(key.name());
 	}
 	
+	public String getProperty(MessageType key) {
+		return properties.getProperty(key.name());
+	}
+	
+	public String getProperty(String key) {
+		return properties.getProperty(key);
+	}
+	
 	public MessageType getType() {
 		String str = getProperty(MessageKey.MessageType);
 		if (str != null) {

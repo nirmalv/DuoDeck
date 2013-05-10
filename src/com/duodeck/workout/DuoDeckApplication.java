@@ -16,8 +16,6 @@ public class DuoDeckApplication extends Application {
 
 	public static final String ACCOUNT_NAME = "username";
 	public static final String ACCOUNT_TOKEN = "oauth_token";
-	public static final String USER_STATUS = "offline";
-	public static final String FULL_JID = "full_jid";
 	
 	public static int[] shuffledOrder;
 	
@@ -29,7 +27,6 @@ public class DuoDeckApplication extends Application {
 	private boolean isConnected = false;
 	private GameStates currentGameState = GameStates.Solo;
 	private HashMap<String, String> contactList = new HashMap<String, String>();
-	private SharedPreferences settings;
 
 	private PersistentStorage ps;
 	
@@ -46,11 +43,10 @@ public class DuoDeckApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
-		username = settings.getString(DuoDeckApplication.ACCOUNT_NAME, "");
-		token = settings.getString(DuoDeckApplication.ACCOUNT_TOKEN, "");
-		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 		ps = new PersistentStorage();
+		username = ps.getUserName(this);
+		token = ps.getAuthToken(this);
+		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
         startService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
 	}
 
@@ -66,9 +62,7 @@ public class DuoDeckApplication extends Application {
 	
 	public void setUsername(String uname) {
 		username = uname;
-		Editor edit = settings.edit();
-		edit.putString(ACCOUNT_NAME, uname);
-		edit.commit();
+		ps.updateUserName(this, uname);
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 	}
 	
@@ -78,9 +72,7 @@ public class DuoDeckApplication extends Application {
 	
 	public void setAuthToken(String authToken) {
 		token = authToken;
-		Editor edit = settings.edit();
-		edit.putString(ACCOUNT_TOKEN, authToken);
-		edit.commit();
+		ps.updateAuthToken(this, authToken);
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
 	}
 
@@ -114,14 +106,6 @@ public class DuoDeckApplication extends Application {
 
 	public synchronized void setCurrentGameState(GameStates currentState) {
 		this.currentGameState = currentState;
-	}
-
-	public SharedPreferences getSettings() {
-		return settings;
-	}
-
-	public void setSettings(SharedPreferences settings) {
-		this.settings = settings;
 	}
 	
 	public ArrayList<String> getContactList() {
