@@ -28,7 +28,7 @@ public class GameActivity extends Activity {
 	public Deck deck;
 	public Card currentCard;
 
-	private int buddyCardIndex = 0;
+	private int buddyCardIndex;
 
 	// chronometer
 	long chronometerTimeWhenStopped = 0;
@@ -44,6 +44,7 @@ public class GameActivity extends Activity {
 			switch(msg.what) {
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER:
 				setDeckOrderAndStartWorkout();
+				buddyCardIndex = deck.getDeckSize() + 1;
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
 				startChronoIfNotRunningAndDisplayCurrentCard();
@@ -84,19 +85,19 @@ public class GameActivity extends Activity {
 	private void setGameStateBasedOnIndex() {
 		if (buddyCardIndex == deck.getDeckSize())
 		{ 
-			// if mine == buddyIndex then set to both working
 			dismissModal();
-			setGameState(GameStates.BothWorkingOut);
-		} else if (buddyCardIndex > deck.getDeckSize()) 
+			if (deck.getDeckSize() == 0)
+				setGameState(GameStates.BothDone);
+			else
+				setGameState(GameStates.BothWorkingOut);
+		} else if (buddyCardIndex < deck.getDeckSize()) 
 		{ 
-			// if mine < buddyIndex then meworking buddy waiting
 			setGameState(GameStates.MeWorkingOutBuddyWaiting);
-		} /*else if (buddyCardIndex < deck.getDeckSize()) 
+		} else if (buddyCardIndex > deck.getDeckSize()) 
 		{
-			// if mine > buddyindex then me waiting buddy working out
 			showModalMessage("WAITING FOR BUDDY", false);
 			setGameState(GameStates.MeWaitingBuddyWorkingOut);
-		}*/
+		}
 	}
 
 	private ServiceConnection mConnection = new ServiceConnection() {
@@ -277,46 +278,31 @@ public class GameActivity extends Activity {
 			// should not be an option for "doneWithThisCard()"
 			break;
 		case BothWorkingOut:
-
-			showModalMessage("WAITING FOR BUDDY", false);
-
-			// tell buddy i'm done
+		case MeWorkingOutBuddyWaiting:
 			sendDoneWithCard();
-
-			// Get next index from deck
-			currentCard = deck.getAndPullNextCardFromDeck();
-
-			// change the status to MeWaitingBuddyWorkingOut
-			setGameState(GameStates.MeWaitingBuddyWorkingOut);
-
-			// 	wait
-			//   once async responds that buddy has finished, then it will call displayCurrentCard()
+			this.moveGameForward();
 			break;
 		case MeWaitingBuddyWorkingOut:
 			// should not be an option for "doneWithThisCard()"
 			break;
-		case MeWorkingOutBuddyWaiting:
-
-			// let buddy know that i'm done
-			sendDoneWithCard();
-
-			// pull cards
-			//TODO: Evan - don't think this is the right way
-			asyncDrawCardsUntilMatchWithBuddy();
-			displayCurrentCard();
-
-			setGameState(GameStates.BothWorkingOut);
-
-			break;
 		case BothDone:
-			// show summary card or redirect to stats
+			// should not be an option
 			break;
 		default:
 			break;
 		}
 	}
 
-
+	private void moveGameForward() {
+		setGameStateBasedOnIndex();
+		if (getGameState() == GameStates.MeWorkingOutBuddyWaiting || 
+				getGameState() == GameStates.BothWorkingOut) { 
+			currentCard = deck.getAndPullNextCardFromDeck();
+			displayCurrentCard();
+		} else if(getGameState() == GameStates.BothDone) {
+			// move to states
+		} 
+	}
 
 	private void startChronoIfNotRunningAndDisplayCurrentCard() 
 	{
@@ -492,11 +478,14 @@ public class GameActivity extends Activity {
 	}
 	private synchronized void setBuddyCardIndex(int buddyIndex, int myIndexThatBuddyHas) {
 		this.buddyCardIndex = buddyIndex;
-		//also update required states here.
+		if (getGameState() == GameStates.MeWaitingBuddyWorkingOut) {
+			this.moveGameForward();
+		} 
 	}
 	private void sendShuffledOrder() {
 		duoDeckApp.setDeckOrder(this.deck.getOrder());
 		sendMsgToService(DuoDeckService.MSG_SEND_SHUFFLED_ORDER, 1, 1);
+		buddyCardIndex = deck.getDeckSize() + 1;
 	}
 	private void sendShuffledOrderResponse() {
 		sendMsgToService(DuoDeckService.MSG_SEND_SHUFFLED_ORDER_RESPONSE, 1, 1);
