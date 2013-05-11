@@ -34,7 +34,7 @@ public class GameActivity extends Activity {
 	long chronometerTimeWhenStopped = 0;
 	private boolean chronoRunning = false; 
 	private Messenger mService = null;
-	private AlertDialog popupMessage;
+	private AlertDialog popupModal;
 
 	final Messenger mMessenger = new Messenger(new HandleMessage());
 
@@ -47,6 +47,7 @@ public class GameActivity extends Activity {
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
 				startChronoIfNotRunningAndDisplayCurrentCard();
+				setGameState(GameStates.BothWorkingOut);
 				break;
 			case DuoDeckService.MSG_SESSION_CLOSED:
 				informSessionClosed(); 
@@ -73,14 +74,18 @@ public class GameActivity extends Activity {
 	}
 
 
+	private void dismissModal() {
+		if (popupModal != null) {
+			popupModal.dismiss();
+			popupModal = null;
+		}
+	}
+	
 	private void setGameStateBasedOnIndex() {
 		if (buddyCardIndex == deck.getDeckSize())
 		{ 
 			// if mine == buddyIndex then set to both working
-			if (popupMessage != null) {
-				popupMessage.dismiss();
-				popupMessage = null;
-			}
+			dismissModal();
 			setGameState(GameStates.BothWorkingOut);
 		} else if (buddyCardIndex > deck.getDeckSize()) 
 		{ 
@@ -143,10 +148,7 @@ public class GameActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if(popupMessage != null) {
-			popupMessage.dismiss();
-			popupMessage = null;
-		}
+		dismissModal();
 	}
 
 	private void onResumeGameHandler() {
@@ -170,7 +172,6 @@ public class GameActivity extends Activity {
 			// 	async will receive the response
 			// 	it will call start deck
 			// 	set mode to both working
-			pickupGameStartingDuoPlayAsSender();
 			break;
 		case StartingDuoPlayAsReceiver:
 			showModalMessage("Performing sync-up", false);
@@ -193,11 +194,6 @@ public class GameActivity extends Activity {
 			break;
 		}
 
-	}
-
-	private void pickupGameStartingDuoPlayAsSender() {
-		// TODO: get params
-		// TODO: take actions
 	}
 
 	public void doneWithThisCard(View view) 
@@ -324,6 +320,8 @@ public class GameActivity extends Activity {
 
 	private void startChronoIfNotRunningAndDisplayCurrentCard() 
 	{
+		dismissModal();
+		
 		// make sure that the "done" button isn't visible
 		View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
 		findViewById(R.id.gotoStatsFromGame).setVisibility(buttonGotoStats.INVISIBLE);
@@ -344,7 +342,7 @@ public class GameActivity extends Activity {
 	}
 	private void resumeChronoAndDismissModal() {
 		resumeChronometer(null);
-		popupMessage.dismiss();
+		popupModal.dismiss();
 	}
 
 	private void displayCurrentCard() 
@@ -362,10 +360,7 @@ public class GameActivity extends Activity {
 	public void showModalMessage(String msg, boolean showOk) {
 		// TODO: make this a modal
 
-		if (popupMessage != null) {
-			popupMessage.dismiss();
-			popupMessage = null;
-		}
+		dismissModal();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
 		builder.setTitle(msg);
@@ -375,8 +370,8 @@ public class GameActivity extends Activity {
 				public void onClick(DialogInterface dialog, int which) {}
 			});
 		}
-		popupMessage = builder.create();
-		popupMessage.show();
+		popupModal = builder.create();
+		popupModal.show();
 
 		// display card
 		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
@@ -465,11 +460,14 @@ public class GameActivity extends Activity {
 		System.out.println("Target order: " + Arrays.toString(targetOrder));
 		if (targetOrder == null) {
 			System.out.println("Some issue in deck order received");
+			// TODO: handle this error
 		} else {
 			this.deck.setOrderToMatch(targetOrder);
 			currentCard = deck.getAndPullNextCardFromDeck();
 			this.startChronoIfNotRunningAndDisplayCurrentCard();
 			this.sendShuffledOrderResponse();
+
+			setGameState(GameStates.BothWorkingOut);
 		}
 	}
 

@@ -22,12 +22,14 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme" 
+        android:screenOrientation="portrait" >
         <activity
             android:name="com.duodeck.workout.LandingScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
-            android:theme="@style/FullscreenTheme" >
+            android:theme="@style/FullscreenTheme"
+        	android:screenOrientation="portrait"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,19 +38,23 @@
         </activity>
         <activity
             android:name="com.duodeck.workout.GameActivity"
-            android:label="@string/title_activity_game" >
+            android:label="@string/title_activity_game" 
+        	android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.duodeck.workout.StatsActivity"
-            android:label="@string/title_activity_stats" >
+            android:label="@string/title_activity_stats" 
+        	android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.duodeck.workout.ZZ_AndroidStorageActivity"
-            android:label="@string/title_activity_android_storage" >
+            android:label="@string/title_activity_android_storage"  
+        	android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.duodeck.workout.WorkoutWithBuddyActivity"
-            android:label="@string/title_activity_workout_with_buddy" >
+            android:label="@string/title_activity_workout_with_buddy"  
+        	android:screenOrientation="portrait" >
         </activity>
 
         <service
@@ -58,7 +64,8 @@
 
         <activity
             android:name="com.duodeck.workout.InviteFromBuddyActivity"
-            android:label="@string/title_activity_invite_from_buddy" >
+            android:label="@string/title_activity_invite_from_buddy"  
+        	android:screenOrientation="portrait" >
         </activity>
     </application>
 

@@ -326,19 +326,19 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				System.out.println("Chat session created with " + buddyName);
 			} else if (chat.getThreadID().contains(APP_CHAT_RESOURCE)){
 				System.out.println("Sorry, we are alreay in a workout session");
-				DuoDeckSession temp = new DuoDeckSession(chat, username, buddyName, this);
-				try {
-					// we are already in a work-out session, so decline invite
-					DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString())
-								  .send(temp);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (XMPPException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
-				temp = null;
+//				DuoDeckSession temp = new DuoDeckSession(chat, username, buddyName, this);
+//				try {
+//					// we are already in a work-out session, so decline invite
+//					DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString())
+//								  .send(temp);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (XMPPException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} 
+//				temp = null;
 			}
 		} 
 		System.out.println("New chat session created");
