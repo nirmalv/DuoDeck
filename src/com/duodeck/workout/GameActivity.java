@@ -158,6 +158,7 @@ public class GameActivity extends Activity {
 		case Solo: 
 			if (!chronoRunning) 
 			{ // if resuming instead of starting a new game
+				// create deck
 				// draw card
 				currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
 				// start game
@@ -278,6 +279,7 @@ public class GameActivity extends Activity {
 			// should not be an option for "doneWithThisCard()"
 			break;
 		case BothWorkingOut:
+			break;
 		case MeWorkingOutBuddyWaiting:
 			sendDoneWithCard();
 			this.moveGameForward();
@@ -446,7 +448,7 @@ public class GameActivity extends Activity {
 		System.out.println("Target order: " + Arrays.toString(targetOrder));
 		if (targetOrder == null) {
 			System.out.println("Some issue in deck order received");
-			// TODO: handle this error
+			// TODO: handle this error message
 		} else {
 			this.deck.setOrderToMatch(targetOrder);
 			currentCard = deck.getAndPullNextCardFromDeck();

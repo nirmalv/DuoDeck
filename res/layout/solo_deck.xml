@@ -18,77 +18,12 @@
         android:id="@+id/display_current_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/solo_done_with_this_card"
         android:layout_below="@+id/solo_deck_title"
         android:layout_centerHorizontal="true"
         android:text="current card info goes here"
+        android:textSize="100dp"
         android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <Button
-        android:id="@+id/solo_done_with_this_card"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/display_current_card"
-        android:layout_centerHorizontal="true"
-        android:onClick="doneWithThisCard"
-        android:text="@string/done_with_this_card" />
-
-    <Button
-        android:id="@+id/Button02"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button2"
-        android:layout_alignBottom="@+id/button2"
-        android:layout_alignRight="@+id/editText1"
-        android:onClick="getData"
-        android:text="LoadData" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/editText1"
-        android:layout_below="@+id/editText1"
-        android:onClick="saveData"
-        android:text="SaveData" />
-
-    <TextView
-        android:id="@+id/display_deck_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/Button02"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="41dp"
-        android:layout_weight="0.11"
-        android:text="display deck info"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/editText1"
-        android:layout_alignBottom="@+id/editText1"
-        android:layout_alignRight="@+id/staticTimeValueDisplay"
-        android:text="Small Text"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <TextView
-        android:id="@+id/staticTimeValueDisplay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/Button01"
-        android:layout_below="@+id/Button01"
-        android:text="staticTimeValueDisplay"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button1"
-        android:layout_below="@+id/button1"
-        android:layout_marginTop="68dp"
-        android:ems="10" />
 
     <Chronometer
         android:id="@+id/chronometer1"
@@ -97,57 +32,45 @@
         android:layout_alignTop="@+id/staticTimeValueDisplay"
         android:layout_toLeftOf="@+id/display_deck_info" />
 
-    <Button
-        android:id="@+id/chronoPause"
-        style="?android:attr/buttonStyleSmall"
+    <TextView
+        android:id="@+id/display_deck_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/editText1"
-        android:layout_alignLeft="@+id/chronometer1"
-        android:onClick="pauseChronometer"
-        android:text="Pause" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="26dp"
+        android:layout_weight="0.11"
+        android:text="display deck info"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <Button
-        android:id="@+id/chronoResume"
-        style="?android:attr/buttonStyleSmall"
+    <TextView
+        android:id="@+id/staticTimeValueDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/display_deck_info"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="48dp"
+        android:text="staticTimeValueDisplay"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/staticTimeValueDisplay"
-        android:layout_toRightOf="@+id/chronoPause"
-        android:onClick="resumeChronometer"
-        android:text="Resume" />
+        android:layout_alignLeft="@+id/staticTimeValueDisplay"
+        android:layout_marginBottom="29dp"
+        android:text="Small Text"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Button
-        android:id="@+id/button1"
-        style="?android:attr/buttonStyleSmall"
+        android:id="@+id/solo_done_with_this_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/solo_done_with_this_card"
-        android:layout_marginTop="49dp"
-        android:onClick="startChronometer"
-        android:text="Start" />
+        android:layout_above="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp"
+        android:onClick="doneWithThisCard"
+        android:text="@string/done_with_this_card" />
 
-    <Button
-        android:id="@+id/Button01"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/chronoPause"
-        android:layout_alignBottom="@+id/chronoPause"
-        android:layout_alignParentRight="true"
-        android:onClick="stopChronometer"
-        android:text="Stop" />
-
-    <Button
-        android:id="@+id/gotoStatsFromGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/chronoPause"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:text="@string/gotoStatsFromGame" 
-        android:onClick="gotoStatsFromGame"
-        android:visibility="invisible"/>
-    
 </RelativeLayout>

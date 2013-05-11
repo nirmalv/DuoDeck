@@ -94,7 +94,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int activity_stats_header=0x7f030004;
         public static final int activity_stats_row=0x7f030005;
         public static final int activity_workout_with_buddy=0x7f030006;
-        public static final int solo_deck=0x7f030007;
+        public static final int debugging_solo_deck=0x7f030007;
+        public static final int solo_deck=0x7f030008;
     }
     public static final class menu {
         public static final int activity_android_storage=0x7f080000;
