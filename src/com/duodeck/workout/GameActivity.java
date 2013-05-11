@@ -44,7 +44,8 @@ public class GameActivity extends Activity {
 				startChronoIfNotRunningAndDisplayCurrentCard();
 				break;
 			case DuoDeckService.MSG_SESSION_CLOSED:
-				informSessionClosed();
+				// TODO: write this (Nirmal)
+				informSessionClosed(); // not done!
 				break;
 			case DuoDeckService.MSG_DONE_WITH_CARD_INDEX:
 				// receiving that buddy is done
@@ -56,9 +57,8 @@ public class GameActivity extends Activity {
 				case MeWaitingBuddyWorkingOut:
 					// i was waiting for buddy to finish this card
 
-					// TODO: do we need to send a received response to buddy?
-
-					// change the game state
+					// TODO: compare indices and then show card
+					
 					// TODO: ensure this works: setGameStateBasedOnIndex(); then remove line below
 					setGameState(GameStates.MeWorkingOutBuddyWaiting);
 
@@ -66,6 +66,8 @@ public class GameActivity extends Activity {
 				case BothWorkingOut:
 					// both of us working out
 
+					// TODO: compare indices and then show card
+					
 					// change the game state
 					// TODO: ensure this works: setGameStateBasedOnIndex(); then remove line below
 					setGameState(GameStates.MeWorkingOutBuddyWaiting);
@@ -73,6 +75,7 @@ public class GameActivity extends Activity {
 					break;
 				case MeWorkingOutBuddyWaiting:
 					// should not arrive here this way
+					// TODO: show this as an error
 					break;
 				}
 				
@@ -274,7 +277,7 @@ public class GameActivity extends Activity {
 			break;
 		case BothWorkingOut:
 
-			showWaitMessage();
+			showModalMessage("WAITING FOR BUDDY");
 
 			// tell buddy i'm done
 			sendDoneWithCard();
@@ -340,13 +343,13 @@ public class GameActivity extends Activity {
 		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
 		deckInfo.setText(deck.showDeck());
 	}
-	public void showWaitMessage() {
+	public void showModalMessage(String msg) {
 		// TODO: make this a modal 
 
 		// display card
 		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
 		// show current card (removed from deck)
-		displayOfCurrentCard.setText("this card: " + "WAITING FOR BUDDY");
+		displayOfCurrentCard.setText("this card: " + msg);
 
 		// ---debugging------------
 		// show full deck
@@ -440,7 +443,7 @@ public class GameActivity extends Activity {
 	}
 
 	private void informSessionClosed() {
-
+		// TODO: ...
 	}
 
 
