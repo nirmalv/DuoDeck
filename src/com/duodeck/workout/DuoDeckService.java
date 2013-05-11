@@ -1,5 +1,6 @@
 package com.duodeck.workout;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -49,13 +50,11 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MSG_REGISTER:
-				output("Register client");
 				sClient = null;
 				sClient = msg.replyTo;
 				break;
 			case MSG_UNREGISTER:
 				sClient = null;
-				output("Unregistering client");
 				break;
 			case MSG_LOGIN:
 				connect();
@@ -79,6 +78,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				}
 				break;
 			case MSG_SEND_SHUFFLED_ORDER:
+				System.out.println("Sending shuffled order");
 				duoDeckConnection.sendShuffledOrder();
 				break;
 			case MSG_SEND_SHUFFLED_ORDER_RESPONSE:
@@ -93,13 +93,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			}
 		}
 	}
-	
-	private void output(String val) {
-		System.out.println(val);
-	}
-	
-	
-	
+		
 	private void connect() {
 		if (duoDeckConnection == null || !duoDeckConnection.getUsername().equals(duoDeckApp.getUsername())) {
 			System.out.println("Connecting to xmpp");
@@ -235,6 +229,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				break;
 			}
 		}
+		System.out.println("Processed order " + Arrays.toString(deckOrder));
 		duoDeckApp.setDeckOrder(deckOrder);
 		sendMsgToClient(MSG_GOT_SHUFFLED_ORDER, 1, 1);
 	}

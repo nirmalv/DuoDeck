@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import android.app.Application;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.text.TextUtils;
 
 public class DuoDeckApplication extends Application {
@@ -18,6 +20,7 @@ public class DuoDeckApplication extends Application {
 	public static final String ACCOUNT_TOKEN = "oauth_token";
 	
 	public static int[] shuffledOrder;
+	public Messenger mService = null;
 	
 	private String username;
 	private String token;
@@ -32,6 +35,7 @@ public class DuoDeckApplication extends Application {
 	
 	private Date inviteStartTime = null;
 	private Date sessionLastMsgTime = null;
+	
 	private int[] deckOrder = null;
 	
 	/**
@@ -39,6 +43,19 @@ public class DuoDeckApplication extends Application {
 	 */
 	public DuoDeckApplication(){
 	}
+	
+	private ServiceConnection mConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			mService = new Messenger(service);
+		}
+		
+		@Override
+		public void onServiceDisconnected(ComponentName className) {
+			mService = null;
+		}
+	};
+	
 	
 	@Override
 	public void onCreate() {
@@ -48,11 +65,14 @@ public class DuoDeckApplication extends Application {
 		token = ps.getAuthToken(this);
 		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
         startService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
+        bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
+        
 	}
 
        @Override
 	public void onTerminate() {
 		// Its ok even if this method is not called, since we could reuse the service
+    	unbindService(mConnection);
 		stopService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
 	}	
 
@@ -118,6 +138,11 @@ public class DuoDeckApplication extends Application {
 	
 	public void updateContactList(String JID, String user) {
 		this.contactList.put(JID, user);
+	}
+	
+	public void removeContact(String JID, String user) {
+		if (this.contactList.containsKey(JID))
+			this.contactList.remove(JID);
 	}
 	
 	public String getBuddyAtIndex(int index) {

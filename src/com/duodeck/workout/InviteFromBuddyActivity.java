@@ -16,25 +16,11 @@ import android.widget.TextView;
 public class InviteFromBuddyActivity extends Activity {
 
 	TextView inviteLabel;
-	private Messenger mService = null;
 	DuoDeckApplication duoDeckApp;
-	
-	private ServiceConnection mConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			mService = new Messenger(service);
-		}
-		
-		@Override
-		public void onServiceDisconnected(ComponentName className) {
-			mService = null;
-		}
-	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
 		setContentView(R.layout.activity_invite_from_buddy);
 		inviteLabel = (TextView) findViewById(R.id.invite_label);
 		Bundle extra = getIntent().getExtras();
@@ -43,24 +29,11 @@ public class InviteFromBuddyActivity extends Activity {
 		duoDeckApp = (DuoDeckApplication) getApplication();
 	}
 	
-	@Override
-	public void onResume() {
-		super.onResume();
-		if (mService == null) 
-			bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		unbindService(mConnection);
-	}
-	
 	public void acceptInvite(View view) {
 		System.out.println("Creating msg in accept");
 		Message msg = Message.obtain(null, DuoDeckService.MSG_INVITE_RESPONSE, 1, 1);
 		try {
-			mService.send(msg);
+			duoDeckApp.mService.send(msg);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,7 +46,7 @@ public class InviteFromBuddyActivity extends Activity {
 	public void declineInvite(View view) {
 		Message msg = Message.obtain(null, DuoDeckService.MSG_INVITE_RESPONSE, 0, 0);
 		try {
-			mService.send(msg);
+			duoDeckApp.mService.send(msg);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

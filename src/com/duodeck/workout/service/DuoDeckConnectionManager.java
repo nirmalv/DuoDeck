@@ -178,8 +178,13 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					String user = StringUtils.parseName(JID);
 					String resource = StringUtils.parseResource(JID);
 					if (resource.contains("duo-deck")){ 
-						((DuoDeckApplication) appContext).updateContactList(JID, user);
-						System.out.println("JID: " + JID + " , user: " + user);
+						if (presence.toString().equals("unavailable")) {
+							((DuoDeckApplication) appContext).removeContact(JID, user);
+							System.out.println("JID: " + JID + " removed.");
+						} else {
+							((DuoDeckApplication) appContext).updateContactList(JID, user);
+							System.out.println("JID: " + JID + " , user: " + user);
+						}
 						listener.getRosterResponse();
 					}
 				}
@@ -240,8 +245,10 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					session.sendInvite();
 					return;
 				}
-				else
+				else {
+					System.out.println("calling invite buddy close");
 					session.close(this);
+				}
 			}
 			Chat c;
 			try {
@@ -315,7 +322,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		if (!createdLocal) { 
 			String buddyName = StringUtils.parseName(chat.getParticipant());
 			if (session == null || StringUtils.parseName(session.getBuddyName()).equals(buddyName)) {
-				if (session != null) session.close(this);
+				session = null;
 				session = new DuoDeckSession(chat, username, buddyName, this);
 				chat.addMessageListener(this);
 				System.out.println("Chat session created with " + buddyName);
@@ -348,27 +355,32 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			try {
 				DuoDeckMessage properties = DuoDeckMessage.fromMessageString(message.getBody());
 				String fromJID = properties.getProperty(DuoDeckMessage.MessageKey.User);
+				if (((DuoDeckApplication) appContext).getCurrentGameState() == GameStates.Solo && message.getBody() == null) {
+					((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
+					this.notifyInvite(properties);
+					((DuoDeckApplication) appContext).setCurrentGameState(GameStates.BuddyInviting);
+				}
 				switch(properties.getType()) {
 				case Invite:
-					System.out.println("Invite: " + message.getBody());
 					((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
 					this.notifyInvite(properties);
 					((DuoDeckApplication) appContext).setCurrentGameState(GameStates.BuddyInviting);
 					break;
 				case InviteResponse:
-					System.out.println("Invite Response: " + message.getBody());
 					boolean accepted = properties.getBooleanProperty(DuoDeckMessage.MessageKey.Response);
 					this.listener.inviteResponse(chat.getParticipant(), accepted);
 					if (!accepted) {
+						System.out.println("Inside not accepted");
 						cleanupSession();
 					} else {
+						System.out.println("Inside accepted");
 						((DuoDeckApplication) appContext).setInviteStartTime(null);
 						((DuoDeckApplication) appContext).setCurrentGameState(GameStates.StartingDuoPlayAsSender);
 					}
 					break;
 				case SendShuffledDeck:
-					System.out.println("Received shuffled deck");
 					String deckOrder = properties.getProperty(DuoDeckMessage.MessageType.SendShuffledDeck);
+					System.out.println("Received shuffled deck with " + deckOrder);
 					this.listener.processShuffledDeck(fromJID, deckOrder);
 					break;
 				case ShuffledDeckResponse:

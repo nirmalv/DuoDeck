@@ -445,8 +445,10 @@ public class GameActivity extends Activity {
 		try {
 			if (mService != null)
 				mService.send(msg);
-			else
-				System.out.println("No service available");
+			else {
+				duoDeckApp.mService.send(msg);
+				System.out.println("No service available, but sent with app service");
+			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
