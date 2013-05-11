@@ -147,6 +147,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:text="@string/gotoStatsFromGame" 
-        android:onClick="gotoStatsFromGame"/>
+        android:onClick="gotoStatsFromGame"
+        android:visibility="invisible"/>
     
 </RelativeLayout>

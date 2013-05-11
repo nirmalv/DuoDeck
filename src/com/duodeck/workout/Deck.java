@@ -144,7 +144,7 @@ public class Deck {
 	}
 	
 	
-	public Card drawFromDeck()
+	public Card getAndPullNextCardFromDeck()
 	{	   
 		if (cards.size() > 0) 
 		{
