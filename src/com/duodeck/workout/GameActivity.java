@@ -35,7 +35,7 @@ public class GameActivity extends Activity {
 	long chronometerTimeWhenStopped = 0;
 	private boolean chronoRunning = false; 
 	private Messenger mService = null;
-	private AlertDialog waitPopup;
+	private AlertDialog popupMessage;
 
 	final Messenger mMessenger = new Messenger(new HandleMessage());
 
@@ -65,7 +65,7 @@ public class GameActivity extends Activity {
 					setGameStateBasedOnIndex();
 					break;
 				}
-				
+
 				break;
 			default:
 				super.handleMessage(msg);
@@ -73,14 +73,14 @@ public class GameActivity extends Activity {
 		}
 	}
 
-	
+
 	private void setGameStateBasedOnIndex() {
 		if (buddyCardIndex == deck.getDeckSize())
 		{ 
 			// if mine == buddyIndex then set to both working
-			if (waitPopup != null) {
-				waitPopup.dismiss();
-				waitPopup = null;
+			if (popupMessage != null) {
+				popupMessage.dismiss();
+				popupMessage = null;
 			}
 			setGameState(GameStates.BothWorkingOut);
 		} else if (buddyCardIndex > deck.getDeckSize()) 
@@ -144,25 +144,28 @@ public class GameActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if(waitPopup != null) {
-			waitPopup.dismiss();
-			waitPopup = null;
+		if(popupMessage != null) {
+			popupMessage.dismiss();
+			popupMessage = null;
 		}
 	}
-	
+
 	private void onResumeGameHandler() {
 		switch (getGameState()) 
 		{
-		case Solo: //TODO: Evan - don't think we want to pull a new card every time we resume.
-			// draw card
-			// start game
-			currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
-			startChronoIfNotRunningAndDisplayCurrentCard(); // starts timer and displays current card
+		case Solo: 
+			if (!chronoRunning) 
+			{ // if resuming instead of starting a new game
+				// draw card
+				currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
+				// start game
+				startChronoIfNotRunningAndDisplayCurrentCard(); // starts timer and displays current card
+			}
 			break;
 		case StartingDuoPlayAsSender:
 			sendShuffledOrder();
 			//TODO: Evan - pause the game here (I don't find anything to do that, is it pausechrono?)
-			stopChronoAndPauseGame();
+			pauseChronoAndShowModal();
 			showModalMessage("Performing sync-up", false);
 			// wait for ordered deck response
 			// 	async will receive the response
@@ -173,7 +176,7 @@ public class GameActivity extends Activity {
 		case StartingDuoPlayAsReceiver:
 			showModalMessage("Performing sync-up", false);
 			//TODO: Evan - pause the game here too
-			stopChronoAndPauseGame();
+			pauseChronoAndShowModal();
 			break;
 		case BothWorkingOut:
 			// do nothing; waiting for trigger or async trigger
@@ -335,11 +338,16 @@ public class GameActivity extends Activity {
 		// display current card
 		displayCurrentCard();
 	}
-	
-	private void stopChronoAndPauseGame() {
-		
+
+	private void pauseChronoAndShowModal() {
+		pauseChronometer(null);
+		showModalMessage("Game waiting...", true);
 	}
-	
+	private void resumeChronoAndDismissModal() {
+		resumeChronometer(null);
+		popupMessage.dismiss();
+	}
+
 	private void displayCurrentCard() 
 	{		
 		// display card
@@ -354,12 +362,12 @@ public class GameActivity extends Activity {
 	}
 	public void showModalMessage(String msg, boolean showOk) {
 		// TODO: make this a modal
-		
-		if (waitPopup != null) {
-			waitPopup.dismiss();
-			waitPopup = null;
+
+		if (popupMessage != null) {
+			popupMessage.dismiss();
+			popupMessage = null;
 		}
-		
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
 		builder.setTitle(msg);
 		if (showOk) {
@@ -368,8 +376,8 @@ public class GameActivity extends Activity {
 				public void onClick(DialogInterface dialog, int which) {}
 			});
 		}
-		waitPopup = builder.create();
-		waitPopup.show();
+		popupMessage = builder.create();
+		popupMessage.show();
 
 		// display card
 		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
@@ -385,11 +393,9 @@ public class GameActivity extends Activity {
 
 
 	public void gotoStatsFromGame(View view) {
-		//        System.out.println("goto Stats from Game");
-		// TODO: call onDestroy() of game. 
-		// TODO: in onDestroy() of game, start stats
 		Intent intent = new Intent(this, StatsActivity.class);
 		startActivity(intent);
+		finish(); // kills game activity
 	};
 
 
