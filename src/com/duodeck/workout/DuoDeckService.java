@@ -24,7 +24,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	public static final int MSG_REGISTER = 1;
 	public static final int MSG_UNREGISTER = 2;
 	public static final int MSG_LOGIN = 3;
-	public static final int MSG_GET_ROSTER = 4;
+	public static final int MSG_GET_ROSTER = 4; // contacts
 	public static final int MSG_INVITE = 5;
 	public static final int MSG_INVITE_RESPONSE = 6;
 	public static final int MSG_SEND_SHUFFLED_ORDER = 7;

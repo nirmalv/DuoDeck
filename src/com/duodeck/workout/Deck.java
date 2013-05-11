@@ -148,8 +148,8 @@ public class Deck {
 	{	   
 		if (cards.size() > 0) 
 		{
-			order = Arrays.copyOfRange(order, 1, order.length);
-			return cards.remove( 0 );
+			order = Arrays.copyOfRange(order, 0, order.length - 1);
+			return cards.remove( cards.size() - 1 );
 		} else {
 			return finishedCard;
 		}

@@ -42,7 +42,7 @@ public class GameActivity extends Activity {
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER:
-				setDeckOrder();
+				setDeckOrderAndStartWorkout();
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
 				startTheWorkout();
@@ -100,12 +100,36 @@ public class GameActivity extends Activity {
 		super.onResume();
 		if (mService == null)
 			bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
+		
+		switch (currentGameState) 
+		{
+			case Solo:
+				break;
+			case StartingDuoPlayAsSender:
+				pickupGameStartingDuoPlayAsSender();
+				break;
+			case StartingDuoPlayAsReceiver:
+				break;
+			case BothWorkingOut:
+				break;
+			case MeWaitingBuddyWorkingOut:
+				break;
+			case MeWorkingOutBuddyWaiting:
+				break;
+			case BothDone:
+				break;
+		}
+		
 	}
 	
+	private void pickupGameStartingDuoPlayAsSender() {
+		// TODO: get params
+		// TODO: take actions
+	}
+
 	@Override 
 	protected void onPause(){
         super.onPause();
-        sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
 		if (mService != null)
 			unbindService(mConnection);
         // do we want to do anything here?
@@ -198,8 +222,14 @@ public class GameActivity extends Activity {
 				
 				
 			// TODO: person receiving the card needs to remove the used card
-				
-				
+
+			case StartingDuoPlayAsSender:
+				pickupGameStartingDuoPlayAsSender();
+				break;
+			case StartingDuoPlayAsReceiver:
+				break;
+			case BothWorkingOut:
+				break;
 			case MeWaitingBuddyWorkingOut:
 				// TODO: record the time that this was finished
 				// TODO: queue a new card (pull it from the deck), but don't show it yet
@@ -207,14 +237,13 @@ public class GameActivity extends Activity {
 				// TODO: show "wait" screen
 				// TODO: put in "wait" state that can receive a push notification to move forward
 				break;
-				
 			case MeWorkingOutBuddyWaiting:
 				// TODO: request the card from buddy
 				// TODO: remove this card from my deck
 				// TODO: Notify partner that i'm done
 				// TODO: start the next card
 				break;
-				
+			case BothDone:
 			default:
 				break;
 		}
@@ -224,7 +253,9 @@ public class GameActivity extends Activity {
 
 	public void gotoStatsFromGame(View view) {
 //        System.out.println("goto Stats from Game");
-    	Intent intent = new Intent(this, StatsActivity.class);
+    	// TODO: call onDestroy() of game. 
+		// TODO: in onDestroy() of game, start stats
+		Intent intent = new Intent(this, StatsActivity.class);
     	startActivity(intent);
 	};
 	
@@ -297,7 +328,7 @@ public class GameActivity extends Activity {
 		}
 	}
 	
-	private synchronized void setDeckOrder() {
+	private synchronized void setDeckOrderAndStartWorkout() {
 		int[] targetOrder = duoDeckApp.getDeckOrder();
 		if (targetOrder == null) {
 			System.out.println("Some issue in deck order received");
