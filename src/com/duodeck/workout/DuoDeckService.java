@@ -70,12 +70,10 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			case MSG_INVITE_RESPONSE:
 				System.out.println("Sending response before if");
 				GameStates cState = duoDeckApp.getCurrentGameState();
-				if (msg.arg1 == 1 && cState == GameStates.BuddyInviting) {
+				if (msg.arg1 == 1 && cState == GameStates.StartingDuoPlayAsReceiver) {
 					System.out.println("Sending response inside if");
-					duoDeckApp.setCurrentGameState(GameStates.StartingDuoPlayAsReceiver);
 					duoDeckConnection.acceptInvite();
 				} else {
-					duoDeckApp.setCurrentGameState(GameStates.Solo);
 					System.out.println("Sending response inside else");
 					duoDeckConnection.declineInvite();
 				}
@@ -290,8 +288,10 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			default:
 				if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
 					System.out.println("Expiring workout session");
-					duoDeckConnection.cleanupSession();
-					sendMsgToClient(MSG_SESSION_CLOSED, 0, 0);
+					if (duoDeckConnection.isConnected()) {
+						duoDeckConnection.cleanupSession();
+						sendMsgToClient(MSG_SESSION_CLOSED, 0, 0);
+					}
 				}
 				break;
 			}

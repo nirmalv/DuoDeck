@@ -252,6 +252,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			session = new DuoDeckSession(c, this.username, buddyName, this);
 			session.sendInvite();
 			System.out.println("Invite sent");
+			session.sendInvite();
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.cleanupSession();
@@ -261,6 +262,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void sendShuffledOrder() {
 		int[] deckOrder = ((DuoDeckApplication) appContext).getDeckOrder();
+		System.out.println("Sending shuffled order " + Arrays.toString(deckOrder));
 		if (deckOrder != null) {
 			String deckStr = Arrays.toString(deckOrder);
 			try {

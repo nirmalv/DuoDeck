@@ -26,7 +26,7 @@ public class Deck {
 	public InGameStatsBySuit pushups = inGameStats.createStatsForExercise();
 	public InGameStatsBySuit situps = inGameStats.createStatsForExercise();
 	
-	Deck()
+	public Deck()
 	{
 		populateDeck();
 		createCardOrder();
@@ -34,7 +34,7 @@ public class Deck {
 		setOrderToMatch(order);
 	}
 	
-	Deck(int[] targetOrder)
+	public Deck(int[] targetOrder)
 	{
 		populateDeck();
 		createCardOrder();

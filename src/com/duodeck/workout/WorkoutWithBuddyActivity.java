@@ -43,6 +43,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 	private TextView labelDisplay;
 	private ListView listView;
 	private ArrayList<String> contactList;
+	private AlertDialog waitPopup;
 	
 	final Messenger mMessenger = new Messenger(new HandleMessage());
 	
@@ -126,6 +127,10 @@ public class WorkoutWithBuddyActivity extends Activity {
 				switch(duoDeckApp.getCurrentGameState()) {
 				case Solo:
 					sendMsgToService(DuoDeckService.MSG_INVITE, pos, 1);
+					AlertDialog.Builder builder = new AlertDialog.Builder(WorkoutWithBuddyActivity.this);
+					builder.setTitle("Waiting for buddy to respond...");
+					waitPopup = builder.create();
+					waitPopup.show();
 					break;
 				case MeInviting:
 					Toast.makeText(getBaseContext(), "Please wait 60sec to get response for your previous invite", Toast.LENGTH_LONG);
@@ -147,9 +152,18 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		//sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
+		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
 		if (mService != null)
 			unbindService(mConnection);
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (waitPopup != null) {
+			waitPopup.dismiss();
+			waitPopup = null;
+		}
 	}
 	
 	private void sendMsgToService(int type, int arg1, int arg2) {
@@ -243,6 +257,8 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@SuppressLint("ShowToast")
 	private void actOnInviteResponse(int success) {
 		System.out.println("Inside act on invite response: " + success);
+		waitPopup.dismiss();
+		waitPopup = null;
 		String buddy = "";
 		if (accSelected != null)
 			buddy = accSelected.name;

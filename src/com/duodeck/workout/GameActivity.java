@@ -1,8 +1,13 @@
 package com.duodeck.workout;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -30,6 +35,7 @@ public class GameActivity extends Activity {
 	long chronometerTimeWhenStopped = 0;
 	private boolean chronoRunning = false; 
 	private Messenger mService = null;
+	private AlertDialog waitPopup;
 
 	final Messenger mMessenger = new Messenger(new HandleMessage());
 
@@ -44,8 +50,7 @@ public class GameActivity extends Activity {
 				startChronoIfNotRunningAndDisplayCurrentCard();
 				break;
 			case DuoDeckService.MSG_SESSION_CLOSED:
-				// TODO: write this (Nirmal)
-				informSessionClosed(); // not done!
+				informSessionClosed(); 
 				break;
 			case DuoDeckService.MSG_DONE_WITH_CARD_INDEX:
 				// receiving that buddy is done
@@ -55,27 +60,9 @@ public class GameActivity extends Activity {
 				switch (getGameState()) 
 				{
 				case MeWaitingBuddyWorkingOut:
-					// i was waiting for buddy to finish this card
-
-					// TODO: compare indices and then show card
-					
-					// TODO: ensure this works: setGameStateBasedOnIndex(); then remove line below
-					setGameState(GameStates.MeWorkingOutBuddyWaiting);
-
-					break;
 				case BothWorkingOut:
-					// both of us working out
-
-					// TODO: compare indices and then show card
-					
-					// change the game state
-					// TODO: ensure this works: setGameStateBasedOnIndex(); then remove line below
-					setGameState(GameStates.MeWorkingOutBuddyWaiting);
-
-					break;
 				case MeWorkingOutBuddyWaiting:
-					// should not arrive here this way
-					// TODO: show this as an error
+					setGameStateBasedOnIndex();
 					break;
 				}
 				
@@ -87,22 +74,26 @@ public class GameActivity extends Activity {
 	}
 
 	
-// TODO: ensure this works and then enable it
-//	private void setGameStateBasedOnIndex() {
-//		if (buddyCardIndex == deck.getDeckSize())
-//		{ 
-//			// if mine == buddyIndex then set to both working
-//			setGameState(GameStates.BothWorkingOut);
-//		} else if (buddyCardIndex > deck.getDeckSize()) 
-//		{ 
-//			// if mine < buddyIndex then meworking buddy waiting
-//			setGameState(GameStates.MeWorkingOutBuddyWaiting);
-//		} else if (buddyCardIndex < deck.getDeckSize()) 
-//		{
-//			// if mine > buddyindex then me waiting buddy working out
-//			setGameState(GameStates.MeWaitingBuddyWorkingOut);
-//		}
-//	}
+	private void setGameStateBasedOnIndex() {
+		if (buddyCardIndex == deck.getDeckSize())
+		{ 
+			// if mine == buddyIndex then set to both working
+			if (waitPopup != null) {
+				waitPopup.dismiss();
+				waitPopup = null;
+			}
+			setGameState(GameStates.BothWorkingOut);
+		} else if (buddyCardIndex > deck.getDeckSize()) 
+		{ 
+			// if mine < buddyIndex then meworking buddy waiting
+			setGameState(GameStates.MeWorkingOutBuddyWaiting);
+		} /*else if (buddyCardIndex < deck.getDeckSize()) 
+		{
+			// if mine > buddyindex then me waiting buddy working out
+			showModalMessage("WAITING FOR BUDDY", false);
+			setGameState(GameStates.MeWaitingBuddyWorkingOut);
+		}*/
+	}
 
 	private ServiceConnection mConnection = new ServiceConnection() {
 		@Override
@@ -143,25 +134,36 @@ public class GameActivity extends Activity {
 	@Override 
 	protected void onPause(){
 		super.onPause();
+		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
 		if (mService != null)
 			unbindService(mConnection);
 		// do we want to do anything here?
 		// currently not pausing the timer because this is helpful with duodecks
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if(waitPopup != null) {
+			waitPopup.dismiss();
+			waitPopup = null;
+		}
+	}
+	
 	private void onResumeGameHandler() {
 		switch (getGameState()) 
 		{
-		case Solo:
+		case Solo: //TODO: Evan - don't think we want to pull a new card every time we resume.
 			// draw card
 			// start game
 			currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
 			startChronoIfNotRunningAndDisplayCurrentCard(); // starts timer and displays current card
 			break;
 		case StartingDuoPlayAsSender:
-			// game not yet started
-			// send the order to otherside
 			sendShuffledOrder();
+			//TODO: Evan - pause the game here (I don't find anything to do that, is it pausechrono?)
+			stopChronoAndPauseGame();
+			showModalMessage("Performing sync-up", false);
 			// wait for ordered deck response
 			// 	async will receive the response
 			// 	it will call start deck
@@ -169,8 +171,9 @@ public class GameActivity extends Activity {
 			pickupGameStartingDuoPlayAsSender();
 			break;
 		case StartingDuoPlayAsReceiver:
-			// game not yet started
-			// do nothing; waiting for trigger or async trigger
+			showModalMessage("Performing sync-up", false);
+			//TODO: Evan - pause the game here too
+			stopChronoAndPauseGame();
 			break;
 		case BothWorkingOut:
 			// do nothing; waiting for trigger or async trigger
@@ -277,7 +280,7 @@ public class GameActivity extends Activity {
 			break;
 		case BothWorkingOut:
 
-			showModalMessage("WAITING FOR BUDDY");
+			showModalMessage("WAITING FOR BUDDY", false);
 
 			// tell buddy i'm done
 			sendDoneWithCard();
@@ -300,6 +303,7 @@ public class GameActivity extends Activity {
 			sendDoneWithCard();
 
 			// pull cards
+			//TODO: Evan - don't think this is the right way
 			asyncDrawCardsUntilMatchWithBuddy();
 			displayCurrentCard();
 
@@ -331,6 +335,11 @@ public class GameActivity extends Activity {
 		// display current card
 		displayCurrentCard();
 	}
+	
+	private void stopChronoAndPauseGame() {
+		
+	}
+	
 	private void displayCurrentCard() 
 	{		
 		// display card
@@ -343,8 +352,24 @@ public class GameActivity extends Activity {
 		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
 		deckInfo.setText(deck.showDeck());
 	}
-	public void showModalMessage(String msg) {
-		// TODO: make this a modal 
+	public void showModalMessage(String msg, boolean showOk) {
+		// TODO: make this a modal
+		
+		if (waitPopup != null) {
+			waitPopup.dismiss();
+			waitPopup = null;
+		}
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+		builder.setTitle(msg);
+		if (showOk) {
+			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {}
+			});
+		}
+		waitPopup = builder.create();
+		waitPopup.show();
 
 		// display card
 		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
@@ -414,9 +439,6 @@ public class GameActivity extends Activity {
 
 
 
-
-
-
 	private void sendMsgToService(int type, int arg1, int arg2) {
 		Message msg = Message.obtain(null, type, arg1, arg2);
 		msg.replyTo = mMessenger;
@@ -433,6 +455,7 @@ public class GameActivity extends Activity {
 
 	private synchronized void setDeckOrderAndStartWorkout() {
 		int[] targetOrder = duoDeckApp.getDeckOrder();
+		System.out.println("Target order: " + Arrays.toString(targetOrder));
 		if (targetOrder == null) {
 			System.out.println("Some issue in deck order received");
 		} else {
@@ -443,10 +466,8 @@ public class GameActivity extends Activity {
 	}
 
 	private void informSessionClosed() {
-		// TODO: ...
+		this.showModalMessage("Workout session Lost", true);
 	}
-
-
 
 	/*
 	 * Card Order
