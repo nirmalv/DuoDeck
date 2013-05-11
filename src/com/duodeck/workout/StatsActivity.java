@@ -1,12 +1,9 @@
 package com.duodeck.workout;
 
 import android.app.Activity;
-import android.app.Application;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
-
-import com.duodeck.workout.R;
 
 
 public class StatsActivity extends Activity {

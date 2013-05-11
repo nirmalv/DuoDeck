@@ -152,14 +152,14 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
-		if (mService != null)
-			unbindService(mConnection);
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
+		if (mService != null)
+			unbindService(mConnection);
 		if (waitPopup != null) {
 			waitPopup.dismiss();
 			waitPopup = null;

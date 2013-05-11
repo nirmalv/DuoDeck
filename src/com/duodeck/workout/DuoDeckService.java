@@ -219,12 +219,14 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 
 	@Override
 	public void processShuffledDeck(String fromJID, String deckOrderStr) {
-		String[] items = deckOrderStr.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
+		String[] items = deckOrderStr.replaceAll("\\[", "").replaceAll("\\]", "").split(", ");
+		System.out.println("raw string " + items);
 		int[] deckOrder = new int[items.length];
 		for (int i = 0; i < items.length ; i++) {
 			try {
 				deckOrder[i] = Integer.parseInt(items[i]);
 			} catch (NumberFormatException nfe) {
+				System.out.println("Error in processing order");
 				this.duoDeckConnection.sendShuffledOrderResponse(false);
 				break;
 			}

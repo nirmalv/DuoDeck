@@ -1,6 +1,5 @@
 package com.duodeck.workout;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import android.app.Activity;
@@ -470,6 +469,7 @@ public class GameActivity extends Activity {
 			this.deck.setOrderToMatch(targetOrder);
 			currentCard = deck.getAndPullNextCardFromDeck();
 			this.startChronoIfNotRunningAndDisplayCurrentCard();
+			this.sendShuffledOrderResponse();
 		}
 	}
 
