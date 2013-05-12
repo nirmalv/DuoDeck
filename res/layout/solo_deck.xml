@@ -14,13 +14,6 @@
         android:text="@string/solo_deck_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Chronometer
-        android:id="@+id/chronometer1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/staticTimeValueDisplay"
-        android:layout_toLeftOf="@+id/display_deck_info" />
-
     <TextView
         android:id="@+id/display_deck_info"
         android:layout_width="wrap_content"
@@ -42,32 +35,38 @@
         android:text="staticTimeValueDisplay"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <TextView
-        android:id="@+id/textView1"
+    <Button
+        android:id="@+id/solo_done_with_this_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/staticTimeValueDisplay"
-        android:layout_alignLeft="@+id/staticTimeValueDisplay"
-        android:layout_marginBottom="29dp"
-        android:text="Small Text"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:onClick="doneWithThisCard"
+        android:text="@string/done_with_this_card" />
 
     <TextView
         android:id="@+id/display_current_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/solo_deck_title"
+        android:layout_above="@+id/solo_done_with_this_card"
         android:layout_centerHorizontal="true"
         android:text="current card info goes here"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/solo_done_with_this_card"
+    <TextView
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/display_current_card"
-        android:layout_centerHorizontal="true"
-        android:onClick="doneWithThisCard"
-        android:text="@string/done_with_this_card" />
+        android:layout_above="@+id/display_current_card"
+        android:layout_alignRight="@+id/display_current_card"
+        android:text="Small Text"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <Chronometer
+        android:id="@+id/chronometer1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/display_current_card"
+        android:layout_alignTop="@+id/textView1" />
 
 </RelativeLayout>

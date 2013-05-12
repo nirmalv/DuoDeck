@@ -152,6 +152,10 @@ public class GameActivity extends Activity {
 		case Solo: 
 			if (!chronoRunning) 
 			{ // if resuming instead of starting a new game
+				TextView gameTypeDisplay = (TextView) findViewById(R.id.display_current_card);
+				// show current card (removed from deck)
+				gameTypeDisplay.setText("Solo Game");
+
 				// create deck
 //				deck.shuffleOrder();
 //				deck.setOrderToMatch(deck.getOrder());
@@ -162,8 +166,9 @@ public class GameActivity extends Activity {
 			}
 			break;
 		case StartingDuoPlayAsSender:
+			((TextView) findViewById(R.id.display_current_card)).setText("Duo Game");
+			
 			sendShuffledOrder();
-			//TODO: Evan - pause the game here (I don't find anything to do that, is it pausechrono?)
 			pauseChronoAndShowModal();
 			showModalMessage("Performing sync-up", false);
 			// wait for ordered deck response
@@ -172,8 +177,9 @@ public class GameActivity extends Activity {
 			// 	set mode to both working
 			break;
 		case StartingDuoPlayAsReceiver:
+			((TextView) findViewById(R.id.display_current_card)).setText("Duo Game");
+			
 			showModalMessage("Performing sync-up", false);
-			//TODO: Evan - pause the game here too
 			pauseChronoAndShowModal();
 			break;
 		case BothWorkingOut:
@@ -241,8 +247,11 @@ public class GameActivity extends Activity {
 				// TODO: make the display look nicer
 				TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
 				currentCard = deck.getAndPullNextCardFromDeck();
-				displayOfCurrentCard.setText(currentCard + "\t\t" + deck.getCardsRemaining() + "/" + deck.getDeckSize() );
+				displayOfCurrentCard.setText(currentCard + "");
 
+				TextView progressDisplay = (TextView) findViewById(R.id.textView1);
+				progressDisplay.setText(deck.getCardsRemaining() + "/" + deck.getDeckSize() );
+				
 				deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();					
 
 			} else { // if done with deck
@@ -261,8 +270,9 @@ public class GameActivity extends Activity {
 				buttonNextCard.setOnClickListener(null);
 
 				// show "finished" text and provide button to stats activity
-				View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-				buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
+//				View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+//				buttonGotoStats.setVisibility(View.VISIBLE);
+				gotoStatsFromGame();
 			}
 
 			break;
@@ -313,12 +323,14 @@ public class GameActivity extends Activity {
 			View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
 			buttonNextCard.setOnClickListener(null);
 
-			// show "finished" text and provide button to stats activity
-			View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+//			setGameState(GameStates.Solo);
 
-			//buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
+			// show "finished" text and provide button to stats activity
+//			View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+//			buttonGotoStats.setVisibility(View.VISIBLE);
+
+			gotoStatsFromGame();
 			
-			setGameState(GameStates.Solo);
 		} 
 	}
 
@@ -357,10 +369,14 @@ public class GameActivity extends Activity {
 	private void displayCurrentCard() 
 	{		
 		// display card
-		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
-		// show current card (removed from deck)
-		displayOfCurrentCard.setText("this card: " + currentCard + "\t\t" + deck.getCardsRemaining() + "/" + deck.getDeckSize() );
 
+		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
+		currentCard = deck.getAndPullNextCardFromDeck();
+		displayOfCurrentCard.setText(currentCard + "");
+
+		TextView progressDisplay = (TextView) findViewById(R.id.textView1);
+		progressDisplay.setText(deck.getCardsRemaining() + "/" + deck.getDeckSize() );
+		
 		// ---debugging------------
 		// show full deck
 		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
@@ -374,10 +390,10 @@ public class GameActivity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
 		builder.setTitle(msg);
 		if (showOk) {
-			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {}
-			});
+//			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+//				@Override
+//				public void onClick(DialogInterface dialog, int which) {}
+//			});
 		}
 		popupModal = builder.create();
 		popupModal.show();
@@ -395,7 +411,7 @@ public class GameActivity extends Activity {
 
 
 
-	public void gotoStatsFromGame(View view) {
+	public void gotoStatsFromGame() {
 		Intent intent = new Intent(this, StatsActivity.class);
 		startActivity(intent);
 		finish(); // kills game activity
@@ -537,26 +553,26 @@ public class GameActivity extends Activity {
 	public void setFontSizeToMax() 
 	{
 		// Determine Scaled Density for later calculations
-		Display dd = ((Activity) Context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics dm = new DisplayMetrics();
-		dd.getMetrics(dm);
-		float m_ScaledDensity = dm.scaledDensity;
-
-		Rect bounds = new Rect();
-		Paint p = new Paint();
-		p.setTypeface(btn.getTypeface());
-
-		// W is a very wide character
-		String sample = "NeedsToFIt"
-		int maxFont;
-		for (maxFont= 1
-		    ; -bounds.top <= btn.getHeight() && bounds.right <= btn.getWidth()
-		    ; maxFont++) {
-		  p.setTextSize(maxFont);
-		  p.getTextBounds(sample, 0, sample.length(), bounds);
-		}
-		maxFont = (int) ((maxFont - 1) / m_ScaledDensity);
-		btn.setTextSize(maxFont);
+//		Display dd = ((Activity) Context).getWindowManager().getDefaultDisplay();
+//		DisplayMetrics dm = new DisplayMetrics();
+//		dd.getMetrics(dm);
+//		float m_ScaledDensity = dm.scaledDensity;
+//
+//		Rect bounds = new Rect();
+//		Paint p = new Paint();
+//		p.setTypeface(btn.getTypeface());
+//
+//		// W is a very wide character
+//		String sample = "NeedsToFIt"
+//		int maxFont;
+//		for (maxFont= 1
+//		    ; -bounds.top <= btn.getHeight() && bounds.right <= btn.getWidth()
+//		    ; maxFont++) {
+//		  p.setTextSize(maxFont);
+//		  p.getTextBounds(sample, 0, sample.length(), bounds);
+//		}
+//		maxFont = (int) ((maxFont - 1) / m_ScaledDensity);
+//		btn.setTextSize(maxFont);
 	}
 
 }
