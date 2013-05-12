@@ -47,6 +47,7 @@ public class GameActivity extends Activity {
 				buddyCardIndex = deck.getDeckSize() + 1;
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
+				currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
 				startChronoIfNotRunningAndDisplayCurrentCard();
 				setGameState(GameStates.BothWorkingOut);
 				break;
@@ -58,14 +59,14 @@ public class GameActivity extends Activity {
 
 				setBuddyCardIndex(msg.arg1, msg.arg2);
 
-				switch (getGameState()) 
-				{
-				case MeWaitingBuddyWorkingOut:
-				case BothWorkingOut:
-				case MeWorkingOutBuddyWaiting:
-					setGameStateBasedOnIndex();
-					break;
-				}
+//				switch (getGameState()) 
+//				{
+//				case MeWaitingBuddyWorkingOut:
+//				case BothWorkingOut:
+//				case MeWorkingOutBuddyWaiting:
+//					setGameStateBasedOnIndex();
+//					break;
+//				}
 
 				break;
 			default:
@@ -159,6 +160,8 @@ public class GameActivity extends Activity {
 			if (!chronoRunning) 
 			{ // if resuming instead of starting a new game
 				// create deck
+//				deck.shuffleOrder();
+//				deck.setOrderToMatch(deck.getOrder());
 				// draw card
 				currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
 				// start game
@@ -302,7 +305,8 @@ public class GameActivity extends Activity {
 			currentCard = deck.getAndPullNextCardFromDeck();
 			displayCurrentCard();
 		} else if(getGameState() == GameStates.BothDone) {
-			// move to states
+			// TODO: update stats
+			// TODO: set game state to solo
 		} 
 	}
 
@@ -312,7 +316,7 @@ public class GameActivity extends Activity {
 		
 		// make sure that the "done" button isn't visible
 		View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-		findViewById(R.id.gotoStatsFromGame).setVisibility(buttonGotoStats.INVISIBLE);
+//		findViewById(R.id.gotoStatsFromGame).setVisibility(View.INVISIBLE);
 
 		// start chrono if not running
 		if (!chronoRunning) { 
