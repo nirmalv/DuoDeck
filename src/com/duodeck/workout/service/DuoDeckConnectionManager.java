@@ -358,6 +358,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			try {
 				DuoDeckMessage properties = DuoDeckMessage.fromMessageString(message.getBody());
 				String fromJID = properties.getProperty(DuoDeckMessage.MessageKey.User);
+				if (fromJID.equals(session.getMyName())) return;
 				if (((DuoDeckApplication) appContext).getCurrentGameState() == GameStates.Solo && message.getBody() == null) {
 					((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
 					this.notifyInvite(properties);
