@@ -307,7 +307,7 @@ public class GameActivity extends Activity {
 
 			// show "finished" text and provide button to stats activity
 			View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-			buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
+//			buttonGotoStats.setVisibility(Views.VISIBLE);
 			
 			setGameState(GameStates.Solo);
 		} 
