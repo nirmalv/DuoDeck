@@ -301,11 +301,10 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		}
 	}
 	
-	public void doneWithCardIndex(int myIndex, int buddyIndex) {
+	public void doneWithCardIndex(int myIndex) {
 		try {
 			DuoDeckMessage.create(DuoDeckMessage.MessageType.DoneWithCardIndex, "Inform")
-			.put("BuddyIndex", Integer.toString(buddyIndex))
-			.put("MyIndex", Integer.toString(myIndex))
+			.put("BuddyIndex", Integer.toString(myIndex))
 			.send(session);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -395,8 +394,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				case DoneWithCardIndex:
 					System.out.println("Done with Card index");
 					int buddyIndex = Integer.parseInt(properties.getProperty("BuddyIndex"));
-					int myIndex = Integer.parseInt(properties.getProperty("MyIndex"));
-					this.listener.dockWithCardIndex(fromJID, buddyIndex, myIndex);
+					this.listener.dockWithCardIndex(fromJID, buddyIndex);
 					break;
 				case Close:
 					System.out.println("Closing session");

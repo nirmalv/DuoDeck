@@ -56,7 +56,7 @@ public class GameActivity extends Activity {
 			case DuoDeckService.MSG_DONE_WITH_CARD_INDEX:
 				// receiving that buddy is done
 
-				setBuddyCardIndex(msg.arg1, msg.arg2);
+				setBuddyCardIndex(msg.arg1);
 
 //				switch (getGameState()) 
 //				{
@@ -486,7 +486,7 @@ public class GameActivity extends Activity {
 			currentCard = deck.getAndPullNextCardFromDeck();
 		}
 	}
-	private synchronized void setBuddyCardIndex(int buddyIndex, int myIndexThatBuddyHas) {
+	private synchronized void setBuddyCardIndex(int buddyIndex) {
 		this.buddyCardIndex = buddyIndex;
 		if (getGameState() == GameStates.MeWaitingBuddyWorkingOut) {
 			this.moveGameForward();
@@ -501,7 +501,7 @@ public class GameActivity extends Activity {
 		sendMsgToService(DuoDeckService.MSG_SEND_SHUFFLED_ORDER_RESPONSE, 1, 1);
 	}
 	private void sendDoneWithCard() {
-		sendMsgToService(DuoDeckService.MSG_DONE_WITH_CARD_INDEX, deck.getDeckSize(), this.buddyCardIndex);
+		sendMsgToService(DuoDeckService.MSG_DONE_WITH_CARD_INDEX, deck.getDeckSize(), 0);
 	}
 
 

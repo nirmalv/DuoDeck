@@ -16,6 +16,6 @@ public interface DuoDeckConnectionListener {
 	
 	void shuffledDeckResponse(String fromJID, boolean success);
 	
-	void dockWithCardIndex(String fromJID, int buddyIndex, int myIndex);
+	void dockWithCardIndex(String fromJID, int buddyIndex);
 	
 }

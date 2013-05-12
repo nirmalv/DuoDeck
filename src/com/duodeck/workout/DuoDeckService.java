@@ -85,8 +85,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				duoDeckConnection.sendShuffledOrderResponse(true);
 				break;
 			case MSG_DONE_WITH_CARD_INDEX:
-				//arg1 is myIndex and arg2 is buddyIndex
-				duoDeckConnection.doneWithCardIndex(msg.arg1, msg.arg2);
+				duoDeckConnection.doneWithCardIndex(msg.arg1);
 				break;
 			default:
 				super.handleMessage(msg);
@@ -245,8 +244,8 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	}
 
 	@Override
-	public void dockWithCardIndex(String fromJID, int buddyIndex, int myIndex) {
-		sendMsgToClient(MSG_DONE_WITH_CARD_INDEX, buddyIndex, myIndex);
+	public void dockWithCardIndex(String fromJID, int buddyIndex) {
+		sendMsgToClient(MSG_DONE_WITH_CARD_INDEX, buddyIndex, 0);
 	}
 	
 	Timer t = new Timer();
