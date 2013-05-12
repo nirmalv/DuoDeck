@@ -55,17 +55,7 @@ public class GameActivity extends Activity {
 				break;
 			case DuoDeckService.MSG_DONE_WITH_CARD_INDEX:
 				// receiving that buddy is done
-
 				setBuddyCardIndex(msg.arg1);
-
-//				switch (getGameState()) 
-//				{
-//				case MeWaitingBuddyWorkingOut:
-//				case BothWorkingOut:
-//				case MeWorkingOutBuddyWaiting:
-//					setGameStateBasedOnIndex();
-//					break;
-//				}
 
 				break;
 			default:
@@ -240,9 +230,6 @@ public class GameActivity extends Activity {
 				// get new card
 				// remove the card from the deck of available options
 				// display the next card
-
-				//					System.out.println("done with this card");
-
 				// TODO: remove for final, this is for debugging only
 				TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
 				deckInfo.setText(deck.showDeck());
@@ -304,8 +291,25 @@ public class GameActivity extends Activity {
 			currentCard = deck.getAndPullNextCardFromDeck();
 			displayCurrentCard();
 		} else if(getGameState() == GameStates.BothDone) {
-			// TODO: update stats
-			// TODO: set game state to solo
+			stopChronometer(null);
+
+			System.out.println("finished deck");
+			deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();
+
+			String statsAsString = ps.makeWorkoutStringForStorage(deck);
+			ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, statsAsString);
+
+			ps.updateStatsWithNewDeck(GameActivity.this, deck);
+
+			// neuter the "next card" button
+			View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
+			buttonNextCard.setOnClickListener(null);
+
+			// show "finished" text and provide button to stats activity
+			View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+			buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
+			
+			setGameState(GameStates.Solo);
 		} 
 	}
 
