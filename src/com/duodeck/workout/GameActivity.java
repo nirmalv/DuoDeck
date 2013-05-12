@@ -314,11 +314,8 @@ public class GameActivity extends Activity {
 
 			// show "finished" text and provide button to stats activity
 			View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-<<<<<<< HEAD
-//			buttonGotoStats.setVisibility(Views.VISIBLE);
-=======
+
 			//buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
->>>>>>> e8ae3277fbbc87c80a88967c52e732f8ceb423f2
 			
 			setGameState(GameStates.Solo);
 		} 
@@ -531,6 +528,34 @@ public class GameActivity extends Activity {
 	private GameStates getGameState() 
 	{
 		return duoDeckApp.getCurrentGameState();
+	}
+	
+	/*
+	 * Aesthetic adjustments
+	 */
+	public void setFontSizeToMax() 
+	{
+		// Determine Scaled Density for later calculations
+		Display dd = ((Activity) Context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics dm = new DisplayMetrics();
+		dd.getMetrics(dm);
+		float m_ScaledDensity = dm.scaledDensity;
+
+		Rect bounds = new Rect();
+		Paint p = new Paint();
+		p.setTypeface(btn.getTypeface());
+
+		// W is a very wide character
+		String sample = "NeedsToFIt"
+		int maxFont;
+		for (maxFont= 1
+		    ; -bounds.top <= btn.getHeight() && bounds.right <= btn.getWidth()
+		    ; maxFont++) {
+		  p.setTextSize(maxFont);
+		  p.getTextBounds(sample, 0, sample.length(), bounds);
+		}
+		maxFont = (int) ((maxFont - 1) / m_ScaledDensity);
+		btn.setTextSize(maxFont);
 	}
 
 }
