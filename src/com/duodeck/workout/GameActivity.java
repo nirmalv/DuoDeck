@@ -323,7 +323,7 @@ public class GameActivity extends Activity {
 			deck.inGameStats.setStartDate();
 		}
 
-		if (currentCard.toString() == "null") 
+		if (currentCard == null) 
 		{
 			currentCard = deck.getAndPullNextCardFromDeck();
 		}
