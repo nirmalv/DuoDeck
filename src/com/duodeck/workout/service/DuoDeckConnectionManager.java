@@ -319,9 +319,10 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		
 		if (!createdLocal) { 
 			String buddyName = StringUtils.parseName(chat.getParticipant());
-			System.out.println("buddy name received: " + buddyName);
+			System.out.println("buddy name received:" + buddyName + ":");
 			if (session != null) {
-				System.out.println("session.getBuddyName(): " + session.getBuddyName());
+				System.out.println("session.getBuddyName():" + session.getBuddyName() + ":");
+				System.out.println("stringUtils... :" + StringUtils.parseName(session.getBuddyName()).equals(buddyName) + ":");
 			}
 			if (session == null || StringUtils.parseName(session.getBuddyName()).equals(buddyName) ||
 					session.getBuddyName().equals(buddyName)) {
