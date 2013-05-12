@@ -18,12 +18,11 @@
         android:id="@+id/display_current_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/solo_done_with_this_card"
         android:layout_below="@+id/solo_deck_title"
         android:layout_centerHorizontal="true"
         android:text="current card info goes here"
-        android:textSize="20dp"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="20dp" />
 
     <Chronometer
         android:id="@+id/chronometer1"
@@ -67,9 +66,8 @@
         android:id="@+id/solo_done_with_this_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textView1"
+        android:layout_below="@+id/display_current_card"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="68dp"
         android:onClick="doneWithThisCard"
         android:text="@string/done_with_this_card" />
 

@@ -47,7 +47,6 @@ public class GameActivity extends Activity {
 				buddyCardIndex = deck.getDeckSize() + 1;
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
-				currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
 				startChronoIfNotRunningAndDisplayCurrentCard();
 				setGameState(GameStates.BothWorkingOut);
 				break;
@@ -283,7 +282,6 @@ public class GameActivity extends Activity {
 			// should not be an option for "doneWithThisCard()"
 			break;
 		case BothWorkingOut:
-			break;
 		case MeWorkingOutBuddyWaiting:
 			sendDoneWithCard();
 			this.moveGameForward();
@@ -325,6 +323,11 @@ public class GameActivity extends Activity {
 			deck.inGameStats.setStartDate();
 		}
 
+		if (currentCard.toString() == "null") 
+		{
+			currentCard = deck.getAndPullNextCardFromDeck();
+		}
+		
 		// display current card
 		displayCurrentCard();
 	}
