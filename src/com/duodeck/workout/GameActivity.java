@@ -75,13 +75,14 @@ public class GameActivity extends Activity {
 	}
 	
 	private void setGameStateBasedOnIndex() {
+		if (deck.getCardsRemaining() == 0 && buddyCardIndex == 0) {
+			dismissModal();
+			setGameState(GameStates.BothDone);
+		}
 		if (buddyCardIndex == deck.getCardsRemaining())
 		{ 
 			dismissModal();
-			if (deck.getCardsRemaining() == 0)
-				setGameState(GameStates.BothDone);
-			else
-				setGameState(GameStates.BothWorkingOut);
+			setGameState(GameStates.BothWorkingOut);
 		} else if (buddyCardIndex < deck.getCardsRemaining()) 
 		{ 
 			dismissModal();
