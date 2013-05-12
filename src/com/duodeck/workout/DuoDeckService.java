@@ -85,7 +85,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				duoDeckConnection.sendShuffledOrderResponse(true);
 				break;
 			case MSG_DONE_WITH_CARD_INDEX:
-				//arg1 is buddyIndex and arg2 is myIndex
+				//arg1 is myIndex and arg2 is buddyIndex
 				duoDeckConnection.doneWithCardIndex(msg.arg1, msg.arg2);
 				break;
 			default:

@@ -301,7 +301,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 		}
 	}
 	
-	public void doneWithCardIndex(int buddyIndex, int myIndex) {
+	public void doneWithCardIndex(int myIndex, int buddyIndex) {
 		try {
 			DuoDeckMessage.create(DuoDeckMessage.MessageType.DoneWithCardIndex, "Inform")
 			.put("BuddyIndex", Integer.toString(buddyIndex))
