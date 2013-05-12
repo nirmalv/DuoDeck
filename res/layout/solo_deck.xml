@@ -22,7 +22,7 @@
         android:layout_below="@+id/solo_deck_title"
         android:layout_centerHorizontal="true"
         android:text="current card info goes here"
-        android:textSize="100dp"
+        android:textSize="20dp"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Chronometer

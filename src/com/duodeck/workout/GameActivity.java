@@ -203,6 +203,7 @@ public class GameActivity extends Activity {
 
 	public void doneWithThisCard(View view) 
 	{
+		System.out.println("done with card. game state: " + getGameState());
 		switch (getGameState()) 
 		{
 		case Solo:
