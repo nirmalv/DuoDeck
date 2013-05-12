@@ -44,7 +44,7 @@ public class GameActivity extends Activity {
 			switch(msg.what) {
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER:
 				setDeckOrderAndStartWorkout();
-				buddyCardIndex = deck.getDeckSize() + 1;
+				buddyCardIndex = deck.getCardsRemaining() + 1;
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
 				startChronoIfNotRunningAndDisplayCurrentCard();
@@ -83,17 +83,17 @@ public class GameActivity extends Activity {
 	}
 	
 	private void setGameStateBasedOnIndex() {
-		if (buddyCardIndex == deck.getDeckSize())
+		if (buddyCardIndex == deck.getCardsRemaining())
 		{ 
 			dismissModal();
-			if (deck.getDeckSize() == 0)
+			if (deck.getCardsRemaining() == 0)
 				setGameState(GameStates.BothDone);
 			else
 				setGameState(GameStates.BothWorkingOut);
-		} else if (buddyCardIndex < deck.getDeckSize()) 
+		} else if (buddyCardIndex < deck.getCardsRemaining()) 
 		{ 
 			setGameState(GameStates.MeWorkingOutBuddyWaiting);
-		} else if (buddyCardIndex > deck.getDeckSize()) 
+		} else if (buddyCardIndex > deck.getCardsRemaining()) 
 		{
 			showModalMessage("WAITING FOR BUDDY", false);
 			setGameState(GameStates.MeWaitingBuddyWorkingOut);
@@ -478,7 +478,7 @@ public class GameActivity extends Activity {
 	{
 		if (getGameState() != GameStates.Solo) 
 		{
-			while (buddyCardIndex < deck.getDeckSize()) 
+			while (buddyCardIndex < deck.getCardsRemaining()) 
 			{
 				currentCard = deck.getAndPullNextCardFromDeck();
 			}
@@ -495,13 +495,13 @@ public class GameActivity extends Activity {
 	private void sendShuffledOrder() {
 		duoDeckApp.setDeckOrder(this.deck.getOrder());
 		sendMsgToService(DuoDeckService.MSG_SEND_SHUFFLED_ORDER, 1, 1);
-		buddyCardIndex = deck.getDeckSize() + 1;
+		buddyCardIndex = deck.getCardsRemaining() + 1;
 	}
 	private void sendShuffledOrderResponse() {
 		sendMsgToService(DuoDeckService.MSG_SEND_SHUFFLED_ORDER_RESPONSE, 1, 1);
 	}
 	private void sendDoneWithCard() {
-		sendMsgToService(DuoDeckService.MSG_DONE_WITH_CARD_INDEX, deck.getDeckSize(), 0);
+		sendMsgToService(DuoDeckService.MSG_DONE_WITH_CARD_INDEX, deck.getCardsRemaining(), 0);
 	}
 
 
