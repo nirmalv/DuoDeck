@@ -56,7 +56,9 @@ public class GameActivity extends Activity {
 			case DuoDeckService.MSG_DONE_WITH_CARD_INDEX:
 				// receiving that buddy is done
 				setBuddyCardIndex(msg.arg1);
-
+				break;
+			case DuoDeckService.MSG_REPEAT_DONE_WITH_CARD:
+				sendDoneWithCard();
 				break;
 			default:
 				super.handleMessage(msg);
@@ -82,6 +84,7 @@ public class GameActivity extends Activity {
 				setGameState(GameStates.BothWorkingOut);
 		} else if (buddyCardIndex < deck.getCardsRemaining()) 
 		{ 
+			dismissModal();
 			setGameState(GameStates.MeWorkingOutBuddyWaiting);
 		} else if (buddyCardIndex > deck.getCardsRemaining()) 
 		{
@@ -275,6 +278,10 @@ public class GameActivity extends Activity {
 			break;
 		case MeWaitingBuddyWorkingOut:
 			// should not be an option for "doneWithThisCard()"
+			if (buddyCardIndex < deck.getCardsRemaining()) {
+				sendDoneWithCard();
+				this.moveGameForward();
+			}
 			break;
 		case BothDone:
 			// should not be an option
@@ -307,7 +314,7 @@ public class GameActivity extends Activity {
 
 			// show "finished" text and provide button to stats activity
 			View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-			buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
+			//buttonGotoStats.setVisibility(buttonGotoStats.VISIBLE);
 			
 			setGameState(GameStates.Solo);
 		} 

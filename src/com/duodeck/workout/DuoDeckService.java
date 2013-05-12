@@ -33,7 +33,8 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	public static final int MSG_GOT_SHUFFLED_ORDER = 9;
 	public static final int MSG_GOT_SHUFFLED_ORDER_RESPONSE = 10;
 	public static final int MSG_DONE_WITH_CARD_INDEX = 11;
-	public static final int MSG_SESSION_CLOSED = 12;
+	public static final int MSG_REPEAT_DONE_WITH_CARD = 12;
+	public static final int MSG_SESSION_CLOSED = 13;
 	
 	public static final int DUODECK_NOTIFICATION_ID = 100;
 	
@@ -280,6 +281,9 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 					duoDeckConnection.declineInvite();
 					deleteNotification();
 				}
+				break;
+			case MeWaitingBuddyWorkingOut:
+				sendMsgToClient(MSG_REPEAT_DONE_WITH_CARD, 0, 0);
 				break;
 			default:
 				if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
