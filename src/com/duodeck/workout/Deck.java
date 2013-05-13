@@ -15,7 +15,7 @@ public class Deck {
 	private int deckSize = 52; // initialize it to expected value, then set dynamically after building the deck
 	private int[] order;
 	
-	private Card finishedCard = new Card(-1, -1);
+	public static Card finishedCard = new Card(-1, -1);
 
 	public String name = "Deck1";
 	

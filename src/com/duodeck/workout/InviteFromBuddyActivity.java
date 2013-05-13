@@ -33,6 +33,7 @@ public class InviteFromBuddyActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		duoDeckApp.setDeckOrder(null);
 		duoDeckApp.setCurrentGameState(GameStates.StartingDuoPlayAsReceiver);
 		Intent intent = new Intent(this, GameActivity.class);
 		startActivity(intent);

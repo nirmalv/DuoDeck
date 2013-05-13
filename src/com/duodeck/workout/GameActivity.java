@@ -44,11 +44,12 @@ public class GameActivity extends Activity {
 			switch(msg.what) {
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER:
 				setDeckOrderAndStartWorkout();
-				buddyCardIndex = deck.getCardsRemaining() + 1;
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
-				startChronoIfNotRunningAndDisplayCurrentCard();
-				setGameState(GameStates.BothWorkingOut);
+				if (getGameState() == GameStates.StartingDuoPlayAsSender) {
+					startChronoIfNotRunningAndDisplayCurrentCard();
+					setGameState(GameStates.BothWorkingOut);
+				}
 				break;
 			case DuoDeckService.MSG_SESSION_CLOSED:
 				informSessionClosed(); 
@@ -75,20 +76,16 @@ public class GameActivity extends Activity {
 	}
 	
 	private void setGameStateBasedOnIndex() {
-		if (deck.getCardsRemaining() == 0 && buddyCardIndex == 0) {
+		if (currentCard.equals(Deck.finishedCard) && buddyCardIndex == 0) {
 			dismissModal();
-			setGameState(GameStates.BothDone);
-		}
-		if (buddyCardIndex == deck.getCardsRemaining())
-		{ 
+			this.goToStatePage();
+		} else if (buddyCardIndex == deck.getCardsRemaining()) {
 			dismissModal();
 			setGameState(GameStates.BothWorkingOut);
-		} else if (buddyCardIndex < deck.getCardsRemaining()) 
-		{ 
+		} else if (buddyCardIndex < deck.getCardsRemaining()) {
 			dismissModal();
 			setGameState(GameStates.MeWorkingOutBuddyWaiting);
-		} else if (buddyCardIndex > deck.getCardsRemaining()) 
-		{
+		} else if (buddyCardIndex > deck.getCardsRemaining()) {
 			showModalMessage("WAITING FOR BUDDY", false);
 			setGameState(GameStates.MeWaitingBuddyWorkingOut);
 		}
@@ -110,22 +107,16 @@ public class GameActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
 		duoDeckApp = (DuoDeckApplication) getApplication();
 		ps = duoDeckApp.getPersistentStorage();
-
 		deck = new Deck();
-
 		setContentView(R.layout.solo_deck);
-
-		onResumeGameHandler(); // based on gameState, waits to start game, starts game, and/or sends appropriate messages to buddy
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (mService == null)
-			bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
+		bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
 
 		onResumeGameHandler(); // based on gameState, waits to start game, starts game, and/or sends appropriate messages to buddy
 	}
@@ -160,7 +151,7 @@ public class GameActivity extends Activity {
 //				deck.shuffleOrder();
 //				deck.setOrderToMatch(deck.getOrder());
 				// draw card
-				currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
+				//currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
 				// start game
 				startChronoIfNotRunningAndDisplayCurrentCard(); // starts timer and displays current card
 			}
@@ -170,17 +161,53 @@ public class GameActivity extends Activity {
 			
 			sendShuffledOrder();
 			pauseChronoAndShowModal();
-			showModalMessage("Performing sync-up", false);
-			// wait for ordered deck response
-			// 	async will receive the response
-			// 	it will call start deck
-			// 	set mode to both working
+			runOnUiThread(new Runnable() {
+				//ugly hack
+				@Override
+				public void run() {
+					for (int i = 0; i < 10; i++)
+						if (getGameState() != GameStates.StartingDuoPlayAsSender)
+							break;
+						else if (getGameState() == GameStates.StartingDuoPlayAsSender
+							&& duoDeckApp.delayedService == 1) {
+							startChronoIfNotRunningAndDisplayCurrentCard();
+							setGameState(GameStates.BothWorkingOut);
+							break;
+						} else {
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+				}
+			});
 			break;
 		case StartingDuoPlayAsReceiver:
 			((TextView) findViewById(R.id.display_current_card)).setText("Duo Game");
-			
-			showModalMessage("Performing sync-up", false);
 			pauseChronoAndShowModal();
+			runOnUiThread(new Runnable() {
+				//ugly hack
+				@Override
+				public void run() {
+					for (int i = 0; i < 10; i++)
+						if (getGameState() != GameStates.StartingDuoPlayAsReceiver) 
+							break;
+						else if (getGameState() == GameStates.StartingDuoPlayAsReceiver
+							&& duoDeckApp.getDeckOrder() != null) {
+							setDeckOrderAndStartWorkout();
+							break;
+						} else {
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+				}
+			});
 			break;
 		case BothWorkingOut:
 			// do nothing; waiting for trigger or async trigger
@@ -306,38 +333,17 @@ public class GameActivity extends Activity {
 		setGameStateBasedOnIndex();
 		if (getGameState() == GameStates.MeWorkingOutBuddyWaiting || 
 				getGameState() == GameStates.BothWorkingOut) { 
-			currentCard = deck.getAndPullNextCardFromDeck();
 			displayCurrentCard();
 		} else if(getGameState() == GameStates.BothDone) {
-			stopChronometer(null);
-
-			System.out.println("finished deck");
-			deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();
-
-			String statsAsString = ps.makeWorkoutStringForStorage(deck);
-			ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, statsAsString);
-
-			ps.updateStatsWithNewDeck(GameActivity.this, deck);
-
-			// neuter the "next card" button
-			View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
-			buttonNextCard.setOnClickListener(null);
-
-//			setGameState(GameStates.Solo);
-
-			// show "finished" text and provide button to stats activity
-//			View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-//			buttonGotoStats.setVisibility(View.VISIBLE);
-
-			gotoStatsFromGame();
-			
+			this.goToStatePage();
 		} 
 	}
 
-	private void startChronoIfNotRunningAndDisplayCurrentCard() 
+	private synchronized void startChronoIfNotRunningAndDisplayCurrentCard() 
 	{
+		System.out.println("Calling start chrono, " + getGameState());
 		dismissModal();
-		
+		duoDeckApp.delayedService = 0;
 		// make sure that the "done" button isn't visible
 		View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
 //		findViewById(R.id.gotoStatsFromGame).setVisibility(View.INVISIBLE);
@@ -347,31 +353,20 @@ public class GameActivity extends Activity {
 			startChronometer(null); 
 			deck.inGameStats.setStartDate();
 		}
-
-		if (currentCard == null) 
-		{
-			currentCard = deck.getAndPullNextCardFromDeck();
-		}
-		
 		// display current card
 		displayCurrentCard();
 	}
 
 	private void pauseChronoAndShowModal() {
 		pauseChronometer(null);
-		showModalMessage("Game waiting...", true);
-	}
-	private void resumeChronoAndDismissModal() {
-		resumeChronometer(null);
-		popupModal.dismiss();
+		showModalMessage("Performing sync-up", false);
 	}
 
 	private void displayCurrentCard() 
 	{		
 		// display card
-
-		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
 		currentCard = deck.getAndPullNextCardFromDeck();
+		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
 		displayOfCurrentCard.setText(currentCard + "");
 
 		TextView progressDisplay = (TextView) findViewById(R.id.textView1);
@@ -381,7 +376,38 @@ public class GameActivity extends Activity {
 		// show full deck
 		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
 		deckInfo.setText(deck.showDeck());
+		if (currentCard.equals(Deck.finishedCard) && buddyCardIndex == 0) {
+			this.goToStatePage();
+		}
 	}
+	
+	private void goToStatePage() {
+		
+		this.dismissModal();
+		
+		stopChronometer(null);
+		setGameState(GameStates.Solo);
+		System.out.println("finished deck");
+		deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();
+
+		String statsAsString = ps.makeWorkoutStringForStorage(deck);
+		ps.saveWorkoutDataToSharedPrefs(GameActivity.this, StatKeys.PreviousDeck, statsAsString);
+
+		ps.updateStatsWithNewDeck(GameActivity.this, deck);
+
+		// neuter the "next card" button
+		View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
+		buttonNextCard.setOnClickListener(null);
+
+//		setGameState(GameStates.Solo);
+
+		// show "finished" text and provide button to stats activity
+//		View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+//		buttonGotoStats.setVisibility(View.VISIBLE);
+
+		gotoStatsFromGame();
+	}
+	
 	public void showModalMessage(String msg, boolean showOk) {
 		// TODO: make this a modal
 
@@ -390,10 +416,10 @@ public class GameActivity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
 		builder.setTitle(msg);
 		if (showOk) {
-//			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-//				@Override
-//				public void onClick(DialogInterface dialog, int which) {}
-//			});
+			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {}
+			});
 		}
 		popupModal = builder.create();
 		popupModal.show();
@@ -416,10 +442,7 @@ public class GameActivity extends Activity {
 		startActivity(intent);
 		finish(); // kills game activity
 	};
-
-
-
-
+	
 	/* 
 	 * CHRONOMETER
 	 */
@@ -481,18 +504,21 @@ public class GameActivity extends Activity {
 	}
 
 	private synchronized void setDeckOrderAndStartWorkout() {
-		int[] targetOrder = duoDeckApp.getDeckOrder();
-		System.out.println("Target order: " + Arrays.toString(targetOrder));
-		if (targetOrder == null) {
-			System.out.println("Some issue in deck order received");
-			// TODO: handle this error message
-		} else {
-			this.deck.setOrderToMatch(targetOrder);
-			currentCard = deck.getAndPullNextCardFromDeck();
-			this.startChronoIfNotRunningAndDisplayCurrentCard();
-			this.sendShuffledOrderResponse();
-
-			setGameState(GameStates.BothWorkingOut);
+		if (getGameState() == GameStates.StartingDuoPlayAsReceiver) {
+			buddyCardIndex = deck.getCardsRemaining() + 1;
+	
+			int[] targetOrder = duoDeckApp.getDeckOrder();
+			System.out.println("Target order: " + Arrays.toString(targetOrder));
+			if (targetOrder == null) {
+				System.out.println("Some issue in deck order received");
+				// TODO: handle this error message
+			} else {
+				this.deck.setOrderToMatch(targetOrder);
+				this.startChronoIfNotRunningAndDisplayCurrentCard();
+				this.sendShuffledOrderResponse();
+	
+				setGameState(GameStates.BothWorkingOut);
+			}
 		}
 	}
 
@@ -500,23 +526,9 @@ public class GameActivity extends Activity {
 		this.showModalMessage("Workout session Lost", true);
 	}
 
-	/*
-	 * Card Order
-	 */
-	private void asyncDrawCardsUntilMatchWithBuddy() 
-	{
-		if (getGameState() != GameStates.Solo) 
-		{
-			while (buddyCardIndex < deck.getCardsRemaining()) 
-			{
-				currentCard = deck.getAndPullNextCardFromDeck();
-			}
-		} else {
-			currentCard = deck.getAndPullNextCardFromDeck();
-		}
-	}
 	private synchronized void setBuddyCardIndex(int buddyIndex) {
 		this.buddyCardIndex = buddyIndex;
+		System.out.println("Got buddy index: " + buddyIndex + ", my index: " + (deck.getCardsRemaining()) + ", status: " + getGameState());
 		if (getGameState() == GameStates.MeWaitingBuddyWorkingOut) {
 			this.moveGameForward();
 		} 

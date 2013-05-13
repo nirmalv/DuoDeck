@@ -18,9 +18,8 @@
         android:id="@+id/wwb_buddyList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/wwb_displayLabel"
-        android:layout_below="@+id/wwb_displayLabel"
-        android:layout_marginTop="27dp" >
+        android:layout_below="@+id/wwb_displayLabel" >
+
     </ListView>
 
 </RelativeLayout>

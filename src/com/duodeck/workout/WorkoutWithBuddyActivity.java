@@ -91,7 +91,6 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
 		setContentView(R.layout.activity_workout_with_buddy);
 		duoDeckApp = (DuoDeckApplication) getApplication();
 		
@@ -116,8 +115,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (mService == null)
-			bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
+		bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
 		
 		listView.setAdapter(new ArrayAdapter<String>(this, R.layout.activity_workout_with_buddy, R.id.wwb_displayLabel, contactList));
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -129,6 +127,13 @@ public class WorkoutWithBuddyActivity extends Activity {
 					sendMsgToService(DuoDeckService.MSG_INVITE, pos, 1);
 					AlertDialog.Builder builder = new AlertDialog.Builder(WorkoutWithBuddyActivity.this);
 					builder.setTitle("Waiting for buddy to respond...");
+					/*builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dismissPopup();
+							sendMsgToService(DuoDeckService.MSG_CANCEL_INVITE,1,1);
+						}
+					});*/
 					waitPopup = builder.create();
 					waitPopup.show();
 					break;
@@ -152,18 +157,23 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
 		sendMsgToService(DuoDeckService.MSG_UNREGISTER, 1, 1);
 		if (mService != null)
 			unbindService(mConnection);
+	}
+	
+	private void dismissPopup() {
 		if (waitPopup != null) {
 			waitPopup.dismiss();
 			waitPopup = null;
 		}
+	}
+	
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		this.dismissPopup();
 	}
 	
 	private void sendMsgToService(int type, int arg1, int arg2) {
@@ -259,8 +269,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 	@SuppressLint("ShowToast")
 	private void actOnInviteResponse(int success) {
 		System.out.println("Inside act on invite response: " + success);
-		waitPopup.dismiss();
-		waitPopup = null;
+		this.dismissPopup();
 		String buddy = "";
 		if (accSelected != null)
 			buddy = accSelected.name;
@@ -268,9 +277,15 @@ public class WorkoutWithBuddyActivity extends Activity {
 			Toast.makeText(this, buddy + " requested for a different time", Toast.LENGTH_LONG).show();
 			duoDeckApp.setCurrentGameState(GameStates.Solo);
 		} else {
+			duoDeckApp.delayedService = 1;
 			duoDeckApp.setCurrentGameState(GameStates.StartingDuoPlayAsSender);
 			Intent intent = new Intent(this, GameActivity.class);
 			startActivity(intent);
 		}
+	}
+	
+	public void resetConnection(View view) {
+		System.out.println("Reset");
+		Message msg = Message.obtain(null, DuoDeckService.MSG_RESET, 1, 1);
 	}
 }

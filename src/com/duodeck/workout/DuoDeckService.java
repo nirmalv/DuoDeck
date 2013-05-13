@@ -1,5 +1,6 @@
 package com.duodeck.workout;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Timer;
@@ -27,6 +28,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	public static final int MSG_LOGIN = 3;
 	public static final int MSG_GET_ROSTER = 4; // contacts
 	public static final int MSG_INVITE = 5;
+	public static final int MSG_CANCEL_INVITE = 14;
 	public static final int MSG_INVITE_RESPONSE = 6;
 	public static final int MSG_SEND_SHUFFLED_ORDER = 7;
 	public static final int MSG_SEND_SHUFFLED_ORDER_RESPONSE = 8;
@@ -35,11 +37,12 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	public static final int MSG_DONE_WITH_CARD_INDEX = 11;
 	public static final int MSG_REPEAT_DONE_WITH_CARD = 12;
 	public static final int MSG_SESSION_CLOSED = 13;
+	public static final int MSG_RESET = 15;
 	
 	public static final int DUODECK_NOTIFICATION_ID = 100;
 	
 	private DuoDeckApplication duoDeckApp;
-	private Messenger sClient;
+	private ArrayList<Messenger> sClient = new ArrayList<Messenger>();
 	private DuoDeckConnectionManager duoDeckConnection;
 	
 	private NotificationManager sNotificationManager;
@@ -51,11 +54,10 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case MSG_REGISTER:
-				sClient = null;
-				sClient = msg.replyTo;
+				sClient.add(msg.replyTo);
 				break;
 			case MSG_UNREGISTER:
-				sClient = null;
+				sClient.remove(msg.replyTo);
 				break;
 			case MSG_LOGIN:
 				connect();
@@ -66,6 +68,11 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				System.out.println("Before inviting buddy: " + buddyName);
 				duoDeckConnection.inviteBuddy(buddyName);
 				System.out.println("Affer inviting buddy: " + buddyName);
+				duoDeckApp.setMyLastMsgTime(new Date(System.currentTimeMillis()));
+				break;
+			case MSG_CANCEL_INVITE:
+				deleteNotification();
+				duoDeckConnection.cleanupSession();
 				break;
 			case MSG_INVITE_RESPONSE:
 				System.out.println("Sending response before if");
@@ -73,6 +80,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				if (msg.arg1 == 1 && cState == GameStates.StartingDuoPlayAsReceiver) {
 					System.out.println("Sending response inside if");
 					duoDeckConnection.acceptInvite();
+					duoDeckApp.setMyLastMsgTime(new Date(System.currentTimeMillis()));
 				} else {
 					System.out.println("Sending response inside else");
 					duoDeckConnection.declineInvite();
@@ -81,13 +89,18 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			case MSG_SEND_SHUFFLED_ORDER:
 				System.out.println("Sending shuffled order");
 				duoDeckConnection.sendShuffledOrder();
+				duoDeckApp.setMyLastMsgTime(new Date(System.currentTimeMillis()));
 				break;
 			case MSG_SEND_SHUFFLED_ORDER_RESPONSE:
 				duoDeckConnection.sendShuffledOrderResponse(true);
+				duoDeckApp.setMyLastMsgTime(new Date(System.currentTimeMillis()));
 				break;
 			case MSG_DONE_WITH_CARD_INDEX:
 				duoDeckConnection.doneWithCardIndex(msg.arg1);
+				duoDeckApp.setMyLastMsgTime(new Date(System.currentTimeMillis()));
 				break;
+			case MSG_RESET:
+				resetConnection();
 			default:
 				super.handleMessage(msg);
 			}
@@ -104,6 +117,13 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		}
 	}
 	
+	private void resetConnection() {
+		deleteNotification();
+		duoDeckConnection.cleanupSession();
+		DuoDeckConnectionManager.close();
+		this.connect();
+	}
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -111,7 +131,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		duoDeckApp = (DuoDeckApplication) getApplication();
 		duoDeckApp.setServiceRunning(true);
 		sNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		t.scheduleAtFixedRate(sessionTimeout, 60000, 60000);
+		t.scheduleAtFixedRate(sessionTimeout, 60000, 10000);
 	}
 	
 	@Override
@@ -162,7 +182,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	}
 	
 	public void deleteNotification() {
-		sNotificationManager.cancel(DUODECK_NOTIFICATION_ID);
+		sNotificationManager.cancelAll();
 	}
 	
 	public NotificationManager getNotificationManager() {
@@ -172,7 +192,8 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 	private void sendMsgToClient(int type, int arg1, int arg2) {
 		try {
 			if (sClient != null) 
-				sClient.send(Message.obtain(null, type, arg1, arg2));
+				for (Messenger m : sClient) 
+					m.send(Message.obtain(null, type, arg1, arg2));
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -258,12 +279,16 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 			Date currentTime = new Date(System.currentTimeMillis());
 			Date inviteTime = duoDeckApp.getInviteStartTime();
 			Date sessionTime = duoDeckApp.getSessionLastMsgTime();
+			Date myLastTime = duoDeckApp.getMyLastMsgTime();
 			int inviteElapse = 0;
 			int sessionElapse = 0;
+			int myTimeElapse = 0;
 			if (inviteTime != null)
 				inviteElapse = (int) ((currentTime.getTime() - inviteTime.getTime()) / 1000);
 			if (sessionTime != null)
 				sessionElapse = (int) ((currentTime.getTime() - sessionTime.getTime()) / 1000);
+			if (myLastTime != null)
+				myTimeElapse = (int) ((currentTime.getTime() - myLastTime.getTime()) / 1000);
 			System.out.println("Inside timer with " + inviteElapse + " and " + sessionElapse + " and state: " + currentState);
 			System.out.println("Invite time:" + inviteTime);
 			System.out.println("session time:" + sessionTime);
@@ -282,11 +307,10 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 					deleteNotification();
 				}
 				break;
-			case MeWaitingBuddyWorkingOut:
-				sendMsgToClient(MSG_REPEAT_DONE_WITH_CARD, 0, 0);
-				break;
 			default:
-				if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
+				if (myTimeElapse > 10) {
+					sendMsgToClient(MSG_REPEAT_DONE_WITH_CARD, 0, 0);
+				} else if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
 					System.out.println("Expiring workout session");
 					if (duoDeckConnection.isConnected()) {
 						duoDeckConnection.cleanupSession();

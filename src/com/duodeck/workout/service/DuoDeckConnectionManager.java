@@ -323,27 +323,14 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				System.out.println("session.getBuddyName():" + session.getBuddyName() + ":");
 				System.out.println("stringUtils... :" + StringUtils.parseName(session.getBuddyName()).equals(buddyName) + ":");
 			}
-			if (session == null || StringUtils.parseName(session.getBuddyName()).equals(buddyName) ||
-					session.getBuddyName().equals(buddyName)) {
+			if (session == null) {// || StringUtils.parseName(session.getBuddyName()).equals(buddyName) ||
+					//session.getBuddyName().equals(buddyName)) {
 				session = null;
 				session = new DuoDeckSession(chat, username, buddyName, this);
 				chat.addMessageListener(this);
 				System.out.println("Chat session created with " + buddyName);
 			} else if (chat.getThreadID().contains(APP_CHAT_RESOURCE)){
 				System.out.println("Sorry, we are alreay in a workout session");
-//				DuoDeckSession temp = new DuoDeckSession(chat, username, buddyName, this);
-//				try {
-//					// we are already in a work-out session, so decline invite
-//					DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, Boolean.FALSE.toString())
-//								  .send(temp);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (XMPPException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} 
-//				temp = null;
 			}
 		} 
 		System.out.println("New chat session created");
@@ -358,7 +345,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			try {
 				DuoDeckMessage properties = DuoDeckMessage.fromMessageString(message.getBody());
 				String fromJID = properties.getProperty(DuoDeckMessage.MessageKey.User);
-				if (fromJID.equals(session.getMyName())) return;
+				if (fromJID.contains(session.getMyName())) return;
 				if (((DuoDeckApplication) appContext).getCurrentGameState() == GameStates.Solo && message.getBody() == null) {
 					((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
 					this.notifyInvite(properties);
@@ -420,6 +407,8 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void errorReported(Exception e) {
 		this.listener.errorReported(e);
+		if (e.getMessage().contains("Retry attempts exeeded")) 
+			this.cleanupSession();
 	}
 	
 	public static void close() {

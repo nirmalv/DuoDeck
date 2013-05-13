@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -19,8 +21,8 @@ public class DuoDeckApplication extends Application {
 	public static final String ACCOUNT_NAME = "username";
 	public static final String ACCOUNT_TOKEN = "oauth_token";
 	
-	public static int[] shuffledOrder;
 	public Messenger mService = null;
+	public int delayedService = 0;
 	
 	private String username;
 	private String token;
@@ -35,6 +37,7 @@ public class DuoDeckApplication extends Application {
 	
 	private Date inviteStartTime = null;
 	private Date sessionLastMsgTime = null;
+	private Date myLastMsgTime = null;
 	
 	private int[] deckOrder = null;
 	
@@ -63,10 +66,9 @@ public class DuoDeckApplication extends Application {
 		ps = new PersistentStorage();
 		username = ps.getUserName(this);
 		token = ps.getAuthToken(this);
-		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
         startService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
         bindService(new Intent(this, DuoDeckService.class), mConnection, Context.BIND_AUTO_CREATE);
-        
+        initAccountStatus();
 	}
 
        @Override
@@ -75,6 +77,23 @@ public class DuoDeckApplication extends Application {
     	unbindService(mConnection);
 		stopService(new Intent(DuoDeckApplication.this, DuoDeckService.class));
 	}	
+       
+    private void initAccountStatus() {
+    	AccountManager accountManager = AccountManager.get(getApplicationContext());
+		Account[] accounts = accountManager.getAccountsByType("com.google");
+		boolean present = false;
+		for (Account a : accounts) {
+			if (a.name.equals(username)) {
+				present = true;
+				break;
+			}
+		}
+		if (!present) {
+			setUsername("");
+			setAuthToken("");
+		}
+		isAccountsetup = !TextUtils.isEmpty(username) && !TextUtils.isEmpty(token);
+    }
 
 	public String getUsername() {
 		return username;
@@ -181,6 +200,14 @@ public class DuoDeckApplication extends Application {
 
 	public synchronized void setDeckOrder(int[] deckOrder) {
 		this.deckOrder = deckOrder;
+	}
+
+	public synchronized Date getMyLastMsgTime() {
+		return myLastMsgTime;
+	}
+
+	public synchronized void setMyLastMsgTime(Date myLastMsgTime) {
+		this.myLastMsgTime = myLastMsgTime;
 	}
 	
 }
