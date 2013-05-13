@@ -71,6 +71,12 @@ public class DuoDeckSession {
 		}
 	}
 	
+	public void setChat(Chat c) {
+		if (this.chat != null)
+			this.chat.removeMessageListener(holder);
+		this.chat = c;
+	}
+	
 	public void sendMessage(String message) throws XMPPException {
 		chat.sendMessage(message);
 		failureMessageBuffer = null;

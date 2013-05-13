@@ -248,21 +248,24 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					session.close(this);
 				}
 			}
-			Chat c;
-			try {
-				c = xmppConnection.getChatManager().createChat(buddyName, APP_CHAT_RESOURCE, this);
-			} catch (IllegalArgumentException e) { // generally there is already a thread id
-				c = xmppConnection.getChatManager().createChat(buddyName, this);
-			}
+			Chat c = this.getNewChat(buddyName);
 			session = new DuoDeckSession(c, this.username, buddyName, this);
-			session.sendInvite();
-			System.out.println("Invite sent");
 			session.sendInvite();
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.cleanupSession();
 			errorReported(e);
 		}
+	}
+	
+	private Chat getNewChat(String buddyName) {
+		Chat c;
+		try {
+			c = xmppConnection.getChatManager().createChat(buddyName, APP_CHAT_RESOURCE, this);
+		} catch (IllegalArgumentException e) { // generally there is already a thread id
+			c = xmppConnection.getChatManager().createChat(buddyName, this);
+		}
+		return c;
 	}
 	
 	public void sendShuffledOrder() {
@@ -323,8 +326,8 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				System.out.println("session.getBuddyName():" + session.getBuddyName() + ":");
 				System.out.println("stringUtils... :" + StringUtils.parseName(session.getBuddyName()).equals(buddyName) + ":");
 			}
-			if (session == null) {// || StringUtils.parseName(session.getBuddyName()).equals(buddyName) ||
-					//session.getBuddyName().equals(buddyName)) {
+			if (session == null || StringUtils.parseName(session.getBuddyName()).equals(buddyName) ||
+					session.getBuddyName().equals(buddyName)) {
 				session = null;
 				session = new DuoDeckSession(chat, username, buddyName, this);
 				chat.addMessageListener(this);
@@ -346,11 +349,6 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				DuoDeckMessage properties = DuoDeckMessage.fromMessageString(message.getBody());
 				String fromJID = properties.getProperty(DuoDeckMessage.MessageKey.User);
 				if (fromJID.contains(session.getMyName())) return;
-				if (((DuoDeckApplication) appContext).getCurrentGameState() == GameStates.Solo && message.getBody() == null) {
-					((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
-					this.notifyInvite(properties);
-					((DuoDeckApplication) appContext).setCurrentGameState(GameStates.BuddyInviting);
-				}
 				switch(properties.getType()) {
 				case Invite:
 					((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));

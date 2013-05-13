@@ -131,7 +131,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 		duoDeckApp = (DuoDeckApplication) getApplication();
 		duoDeckApp.setServiceRunning(true);
 		sNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		t.scheduleAtFixedRate(sessionTimeout, 60000, 10000);
+		t.scheduleAtFixedRate(sessionTimeout, 60000, 30000);
 	}
 	
 	@Override
@@ -308,7 +308,7 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				}
 				break;
 			default:
-				if (myTimeElapse > 10) {
+				if (myTimeElapse > 25) {
 					sendMsgToClient(MSG_REPEAT_DONE_WITH_CARD, 0, 0);
 				} else if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
 					System.out.println("Expiring workout session");
