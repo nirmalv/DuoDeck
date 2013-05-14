@@ -143,7 +143,7 @@ public class GameActivity extends Activity {
 		case Solo: 
 			if (!chronoRunning) 
 			{ // if resuming instead of starting a new game
-				TextView gameTypeDisplay = (TextView) findViewById(R.id.display_current_card);
+				TextView gameTypeDisplay = (TextView) findViewById(R.id.solo_deck_title);
 				// show current card (removed from deck)
 				gameTypeDisplay.setText("Solo Game");
 
@@ -157,7 +157,7 @@ public class GameActivity extends Activity {
 			}
 			break;
 		case StartingDuoPlayAsSender:
-			((TextView) findViewById(R.id.display_current_card)).setText("Duo Game");
+			((TextView) findViewById(R.id.solo_deck_title)).setText("Duo Game");
 			
 			sendShuffledOrder();
 			pauseChronoAndShowModal();

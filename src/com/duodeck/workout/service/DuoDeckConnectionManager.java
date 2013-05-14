@@ -204,7 +204,8 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void acceptInvite(){
 		try {
-			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, "Yes")
+			if (session != null)
+				DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, "Yes")
 					.put(DuoDeckMessage.MessageKey.Response, Boolean.TRUE.toString())
 					.send(session);
 		} catch (Exception e) {
@@ -217,7 +218,8 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 	
 	public void declineInvite() {
 		try {
-			DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, "Not right now")
+			if (session != null)
+				DuoDeckMessage.create(DuoDeckMessage.MessageType.InviteResponse, "Not right now")
 					.put(DuoDeckMessage.MessageKey.Response, Boolean.FALSE.toString())
 					.send(session);
 		} catch (IOException e) {
