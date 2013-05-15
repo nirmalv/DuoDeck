@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0099cc">
+
+    <TextView
+        android:id="@+id/solo_deck_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/solo_deck_title"
+        android:textAppearance="?android:attr/textAppearanceLarge" 
+        android:textColor="#0f3644"/>
+
+    <TextView
+        android:id="@+id/display_deck_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="26dp"
+        android:layout_weight="0.11"
+        android:text="display deck info"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="invisible" 
+        android:textColor="#0f3644"/>
+
+    <Button
+        android:id="@+id/done_with_this_card"
+        android:layout_marginTop="70dp"
+        
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:onClick="doneWithThisCard"
+        android:text="pushups"
+        android:textColor="#33b5e5"
+    	android:background="#0f3644" />
+
+    <Chronometer
+        android:id="@+id/chronometer1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" 
+        android:textColor="#0f3644"/>
+
+    <TextView
+        android:id="@+id/progress_tracking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:text="x/deckSize"
+        android:textAppearance="?android:attr/textAppearanceSmall" 
+        android:textColor="#0f3644"/>
+
+</RelativeLayout>

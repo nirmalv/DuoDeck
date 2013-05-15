@@ -25,6 +25,8 @@
     <string name="invite_accept_button">Accept</string>
     <string name="invite_decline_button">Decline</string>
     <string name="gotoStatsFromGame">Deck complete! See stats.</string>
-    <string name="wwb_reset">Reset</string>
+    <string name="game_text_color">#ffff00</string>
+    <string name="game_bg">#bbbb00</string>
+    <string name="game_button_bg">#888800</string>
 
 </resources>

@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -16,12 +18,17 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
 
 public class GameActivity extends Activity {
 
+	private Context context = (Context) this;
+	
 	private DuoDeckApplication duoDeckApp;
 	private PersistentStorage ps;
 
@@ -110,7 +117,7 @@ public class GameActivity extends Activity {
 		duoDeckApp = (DuoDeckApplication) getApplication();
 		ps = duoDeckApp.getPersistentStorage();
 		deck = new Deck();
-		setContentView(R.layout.solo_deck);
+		setContentView(R.layout.game);
 	}
 
 	@Override
@@ -138,6 +145,7 @@ public class GameActivity extends Activity {
 	}
 
 	private void onResumeGameHandler() {
+		
 		switch (getGameState()) 
 		{
 		case Solo: 
@@ -185,7 +193,7 @@ public class GameActivity extends Activity {
 			});
 			break;
 		case StartingDuoPlayAsReceiver:
-			((TextView) findViewById(R.id.display_current_card)).setText("Duo Game");
+			((TextView) findViewById(R.id.solo_deck_title)).setText("Duo Game");
 			pauseChronoAndShowModal();
 			runOnUiThread(new Runnable() {
 				//ugly hack
@@ -257,27 +265,14 @@ public class GameActivity extends Activity {
 				// TODO: add time duration summation
 				break;
 			}
-
-			TextView staticTimeValue = (TextView) findViewById(R.id.staticTimeValueDisplay);
-			staticTimeValue.setText(((Chronometer) getChronometer()).getText());
-
+			
 			if (deck.getCardsRemaining() > 0) 
 			{ // if not done with deck
 
 				// get new card
 				// remove the card from the deck of available options
 				// display the next card
-				// TODO: remove for final, this is for debugging only
-				TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
-				deckInfo.setText(deck.showDeck());
-
-				// TODO: make the display look nicer
-				TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
-				currentCard = deck.getAndPullNextCardFromDeck();
-				displayOfCurrentCard.setText(currentCard + "");
-
-				TextView progressDisplay = (TextView) findViewById(R.id.textView1);
-				progressDisplay.setText(deck.getCardsRemaining() + "/" + deck.getDeckSize() );
+				displayCurrentCard();
 				
 				deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();					
 
@@ -293,7 +288,7 @@ public class GameActivity extends Activity {
 				ps.updateStatsWithNewDeck(GameActivity.this, deck);
 
 				// neuter the "next card" button
-				View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
+				View buttonNextCard = findViewById(R.id.done_with_this_card);
 				buttonNextCard.setOnClickListener(null);
 
 				// show "finished" text and provide button to stats activity
@@ -344,10 +339,7 @@ public class GameActivity extends Activity {
 		System.out.println("Calling start chrono, " + getGameState());
 		dismissModal();
 		duoDeckApp.delayedService = 0;
-		// make sure that the "done" button isn't visible
-		View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-//		findViewById(R.id.gotoStatsFromGame).setVisibility(View.INVISIBLE);
-
+		
 		// start chrono if not running
 		if (!chronoRunning) { 
 			startChronometer(null); 
@@ -364,18 +356,23 @@ public class GameActivity extends Activity {
 
 	private void displayCurrentCard() 
 	{		
-		// display card
+		setFontSizeToMax();
+		
+		// get new card
 		currentCard = deck.getAndPullNextCardFromDeck();
-		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
-		displayOfCurrentCard.setText(currentCard + "");
+		System.out.println("current card: " + currentCard.toString() + " : " + deck.getCardsRemaining() + "/" + deck.getDeckSize());
+		
+		// display card
+		Button doneWithCard = (Button) findViewById(R.id.done_with_this_card);
+		doneWithCard.setText(currentCard.toString());
 
-		TextView progressDisplay = (TextView) findViewById(R.id.textView1);
+		TextView progressDisplay = (TextView) findViewById(R.id.progress_tracking);
 		progressDisplay.setText(deck.getCardsRemaining() + "/" + deck.getDeckSize() );
 		
 		// ---debugging------------
 		// show full deck
-		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
-		deckInfo.setText(deck.showDeck());
+//		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
+//		deckInfo.setText(deck.showDeck());
 		if (currentCard.equals(Deck.finishedCard) && buddyCardIndex == 0) {
 			this.goToStatePage();
 		}
@@ -396,7 +393,7 @@ public class GameActivity extends Activity {
 		ps.updateStatsWithNewDeck(GameActivity.this, deck);
 
 		// neuter the "next card" button
-		View buttonNextCard = findViewById(R.id.solo_done_with_this_card);
+		View buttonNextCard = findViewById(R.id.done_with_this_card);
 		buttonNextCard.setOnClickListener(null);
 
 //		setGameState(GameStates.Solo);
@@ -409,7 +406,6 @@ public class GameActivity extends Activity {
 	}
 	
 	public void showModalMessage(String msg, boolean showOk) {
-		// TODO: make this a modal
 
 		dismissModal();
 
@@ -424,15 +420,11 @@ public class GameActivity extends Activity {
 		popupModal = builder.create();
 		popupModal.show();
 
-		// display card
-		TextView displayOfCurrentCard = (TextView) findViewById(R.id.display_current_card);
-		// show current card (removed from deck)
-		displayOfCurrentCard.setText("this card: " + msg);
-
-		// ---debugging------------
-		// show full deck
-		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
-		deckInfo.setText(deck.showDeck());
+		displayCurrentCard();
+//		// ---debugging------------
+//		// show full deck
+//		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
+//		deckInfo.setText(deck.showDeck());
 	}
 
 
@@ -564,27 +556,43 @@ public class GameActivity extends Activity {
 	 */
 	public void setFontSizeToMax() 
 	{
+		Button doneWithCard = (Button) findViewById(R.id.done_with_this_card);
+		
+		String before = doneWithCard.getText().toString(); 
+		
 		// Determine Scaled Density for later calculations
-//		Display dd = ((Activity) Context).getWindowManager().getDefaultDisplay();
-//		DisplayMetrics dm = new DisplayMetrics();
-//		dd.getMetrics(dm);
-//		float m_ScaledDensity = dm.scaledDensity;
-//
-//		Rect bounds = new Rect();
-//		Paint p = new Paint();
-//		p.setTypeface(btn.getTypeface());
-//
-//		// W is a very wide character
-//		String sample = "NeedsToFIt"
-//		int maxFont;
-//		for (maxFont= 1
-//		    ; -bounds.top <= btn.getHeight() && bounds.right <= btn.getWidth()
-//		    ; maxFont++) {
-//		  p.setTextSize(maxFont);
-//		  p.getTextBounds(sample, 0, sample.length(), bounds);
-//		}
-//		maxFont = (int) ((maxFont - 1) / m_ScaledDensity);
-//		btn.setTextSize(maxFont);
+		Display dd = ((Activity) context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics dm = new DisplayMetrics();
+		dd.getMetrics(dm);
+		float m_ScaledDensity = dm.scaledDensity;
+
+		Rect bounds = new Rect();
+		Paint p = new Paint();
+		
+		p.setTypeface(doneWithCard.getTypeface());
+
+		String sample = "22 pushups"; //doneWithCard.getText().toString();
+		int maxFont;
+		for (maxFont = 30; 
+//					-bounds.top <= doneWithCard.getHeight() && 
+					bounds.right <= doneWithCard.getWidth(); 
+				maxFont++) {
+		  p.setTextSize(maxFont);
+		  p.getTextBounds(sample, 0, sample.length(), bounds);
+		}
+		maxFont = (int) ((maxFont - 1) / m_ScaledDensity);
+		doneWithCard.setTextSize(maxFont);
+
+		String after = doneWithCard.getText().toString();
+		
+		doneWithCard.setText(doneWithCard.getText());
+		
+		System.out.println(
+				"before: " + before + "\t\t after: " + after + 
+				"\t\t maxFont: " + maxFont +
+				"\t\t bounds: " + bounds.toString() +
+				"\t\t paint: " + p
+				);
 	}
 
 }
