@@ -229,7 +229,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.cleanupSession();
+		//this.cleanupSession();
 	}
 	
 	public void inviteBuddy(String buddyName) {
@@ -240,7 +240,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 			}
 			((DuoDeckApplication) appContext).setInviteStartTime(new Date(System.currentTimeMillis()));
 			if (session != null){
-				if (session.getBuddyName().equals(buddyName)) {
+				if (session.getBuddyName().equals(buddyName) || session.getBuddyName().contains(StringUtils.parseName(buddyName))) {
 					System.out.println("Invite sent inside if");
 					session.sendInvite();
 					return;
@@ -328,8 +328,8 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				System.out.println("session.getBuddyName():" + session.getBuddyName() + ":");
 				System.out.println("stringUtils... :" + StringUtils.parseName(session.getBuddyName()).equals(buddyName) + ":");
 			}
-			if (session == null || StringUtils.parseName(session.getBuddyName()).equals(buddyName) ||
-					session.getBuddyName().equals(buddyName)) {
+			if (session == null) {// || StringUtils.parseName(session.getBuddyName()).equals(buddyName) ||
+					//session.getBuddyName().equals(buddyName)) {
 				session = null;
 				session = new DuoDeckSession(chat, username, buddyName, this);
 				chat.addMessageListener(this);
@@ -338,7 +338,6 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 				System.out.println("Sorry, we are alreay in a workout session");
 			}
 		} 
-		System.out.println("New chat session created");
 	}
 
 	@Override
@@ -362,7 +361,7 @@ public class DuoDeckConnectionManager implements MessageListener, ChatManagerLis
 					this.listener.inviteResponse(chat.getParticipant(), accepted);
 					if (!accepted) {
 						System.out.println("Inside not accepted");
-						cleanupSession();
+						//cleanupSession();
 					} else {
 						System.out.println("Inside accepted");
 						((DuoDeckApplication) appContext).setInviteStartTime(null);

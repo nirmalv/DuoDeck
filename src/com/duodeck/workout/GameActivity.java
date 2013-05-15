@@ -54,6 +54,7 @@ public class GameActivity extends Activity {
 				break;
 			case DuoDeckService.MSG_GOT_SHUFFLED_ORDER_RESPONSE:
 				if (getGameState() == GameStates.StartingDuoPlayAsSender) {
+					System.out.println("update StartingDuoPlayAsSender in msg");
 					startChronoIfNotRunningAndDisplayCurrentCard();
 					setGameState(GameStates.BothWorkingOut);
 				}
@@ -152,15 +153,7 @@ public class GameActivity extends Activity {
 			if (!chronoRunning) 
 			{ // if resuming instead of starting a new game
 				TextView gameTypeDisplay = (TextView) findViewById(R.id.solo_deck_title);
-				// show current card (removed from deck)
 				gameTypeDisplay.setText("Solo Game");
-
-				// create deck
-//				deck.shuffleOrder();
-//				deck.setOrderToMatch(deck.getOrder());
-				// draw card
-				//currentCard = deck.getAndPullNextCardFromDeck(); // draw card from deck
-				// start game
 				startChronoIfNotRunningAndDisplayCurrentCard(); // starts timer and displays current card
 			}
 			break;
@@ -178,6 +171,7 @@ public class GameActivity extends Activity {
 							break;
 						else if (getGameState() == GameStates.StartingDuoPlayAsSender
 							&& duoDeckApp.delayedService == 1) {
+							System.out.println("update StartingDuoPlayAsSender in runnable");
 							startChronoIfNotRunningAndDisplayCurrentCard();
 							setGameState(GameStates.BothWorkingOut);
 							break;
@@ -185,7 +179,6 @@ public class GameActivity extends Activity {
 							try {
 								Thread.sleep(500);
 							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
@@ -272,6 +265,7 @@ public class GameActivity extends Activity {
 				// get new card
 				// remove the card from the deck of available options
 				// display the next card
+				System.out.println("displayCurrentCard in SOLO");
 				displayCurrentCard();
 				
 				deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();					
@@ -327,7 +321,8 @@ public class GameActivity extends Activity {
 	private void moveGameForward() {
 		setGameStateBasedOnIndex();
 		if (getGameState() == GameStates.MeWorkingOutBuddyWaiting || 
-				getGameState() == GameStates.BothWorkingOut) { 
+				getGameState() == GameStates.BothWorkingOut) {
+			System.out.println("displayCurrentCard in moveForward");
 			displayCurrentCard();
 		} else if(getGameState() == GameStates.BothDone) {
 			this.goToStatePage();
@@ -346,6 +341,7 @@ public class GameActivity extends Activity {
 			deck.inGameStats.setStartDate();
 		}
 		// display current card
+		System.out.println("displayCurrentCard in start");
 		displayCurrentCard();
 	}
 
@@ -420,11 +416,6 @@ public class GameActivity extends Activity {
 		popupModal = builder.create();
 		popupModal.show();
 
-		displayCurrentCard();
-//		// ---debugging------------
-//		// show full deck
-//		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
-//		deckInfo.setText(deck.showDeck());
 	}
 
 

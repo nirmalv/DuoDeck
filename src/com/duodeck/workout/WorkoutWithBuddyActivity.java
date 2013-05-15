@@ -245,6 +245,8 @@ public class WorkoutWithBuddyActivity extends Activity {
 							System.out.println("Done calling MSG_LOGIN");
 						} catch (OperationCanceledException e) {
 							System.out.println("User denied authorization");
+							labelDisplay.setText("User denied Permission");
+							accSelected = null;
 						} catch (AuthenticatorException e) {
 							System.out.println("Error when authorizing");
 						} catch (IOException e) {
