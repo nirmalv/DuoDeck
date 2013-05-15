@@ -202,38 +202,4 @@ public class PersistentStorage {
 		}
 	}
     
-//    public void saveDataToFile(EditText inputText, TextView responseText) 
-//	{
-//
-//		try {
-//			FileOutputStream fos = new FileOutputStream(myInternalFile);
-//			fos.write(inputText.getText().toString().getBytes());
-//			fos.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		inputText.setText("");
-//		responseText
-//		.setText("MySampleFile.txt saved to Internal Storage...");
-//	}
-//	
-//	public String getDataFromInternalStorage(EditText inputText, TextView responseText, String data)
-//	{
-//		try {
-//			FileInputStream fis = new FileInputStream(myInternalFile);
-//			DataInputStream in = new DataInputStream(fis);
-//			BufferedReader br = 
-//					new BufferedReader(new InputStreamReader(in));
-//			String strLine;
-//			while ((strLine = br.readLine()) != null) {
-//				data = data + strLine;
-//			}
-//			in.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		inputText.setText(data);
-//		responseText.setText("MySampleFile.txt data retrieved from Internal Storage..." + data);
-//		return data;
-//	}
 }
