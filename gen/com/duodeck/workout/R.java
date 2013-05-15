@@ -49,15 +49,16 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     public static final class id {
         public static final int Button01=0x7f09001e;
         public static final int Button02=0x7f090018;
-        public static final int action_settings=0x7f090027;
+        public static final int action_settings=0x7f090029;
         public static final int button1=0x7f09001f;
         public static final int button2=0x7f090019;
         public static final int chronoPause=0x7f090021;
         public static final int chronoResume=0x7f090022;
         public static final int chronometer1=0x7f090020;
+        public static final int deck_title=0x7f090024;
         public static final int display_current_card=0x7f090016;
         public static final int display_deck_info=0x7f09001b;
-        public static final int done_with_this_card=0x7f090024;
+        public static final int done_with_this_card=0x7f090025;
         public static final int editText1=0x7f09001a;
         public static final int fullscreen_content=0x7f090009;
         public static final int fullscreen_content_controls=0x7f09000a;
@@ -69,9 +70,9 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int invite_decline=0x7f090008;
         public static final int invite_label=0x7f090006;
         public static final int landing_bottom_button=0x7f09000b;
-        public static final int menu_settings=0x7f090026;
+        public static final int menu_settings=0x7f090028;
         public static final int myInputText=0x7f090000;
-        public static final int progress_tracking=0x7f090025;
+        public static final int progress_tracking=0x7f090026;
         public static final int responseText=0x7f090005;
         public static final int saveExternalStorage=0x7f090003;
         public static final int saveInternalStorage=0x7f090001;
@@ -82,6 +83,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int staticTimeValueDisplay=0x7f09001d;
         public static final int statsActivityListView=0x7f09000e;
         public static final int textView1=0x7f09001c;
+        public static final int time_to_beat=0x7f090027;
         public static final int txtHeader=0x7f09000f;
         public static final int txtTitle=0x7f090011;
         public static final int txtValue=0x7f090012;

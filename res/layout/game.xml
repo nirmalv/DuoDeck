@@ -5,7 +5,7 @@
     android:background="#0099cc">
 
     <TextView
-        android:id="@+id/solo_deck_title"
+        android:id="@+id/deck_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -46,18 +46,31 @@
         android:id="@+id/chronometer1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" 
-        android:textColor="#0f3644"/>
+        android:layout_below="@+id/deck_title"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#0f3644" />
 
     <TextView
         android:id="@+id/progress_tracking"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignBaseline="@+id/time_to_beat"
+        android:layout_alignBottom="@+id/time_to_beat"
         android:layout_alignParentRight="true"
         android:text="x/deckSize"
-        android:textAppearance="?android:attr/textAppearanceSmall" 
-        android:textColor="#0f3644"/>
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#0f3644" />
+
+    <TextView
+        android:id="@+id/time_to_beat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/deck_title"
+        android:layout_alignBottom="@+id/deck_title"
+        android:layout_centerHorizontal="true"
+        android:text="previous best"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#0f3644" />
 
 </RelativeLayout>

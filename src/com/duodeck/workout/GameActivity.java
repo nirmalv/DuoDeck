@@ -1,6 +1,8 @@
 package com.duodeck.workout;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -28,7 +31,7 @@ import android.widget.TextView;
 public class GameActivity extends Activity {
 
 	private Context context = (Context) this;
-	
+
 	private DuoDeckApplication duoDeckApp;
 	private PersistentStorage ps;
 
@@ -82,7 +85,7 @@ public class GameActivity extends Activity {
 			popupModal = null;
 		}
 	}
-	
+
 	private void setGameStateBasedOnIndex() {
 		if (currentCard.equals(Deck.finishedCard) && buddyCardIndex == 0) {
 			dismissModal();
@@ -146,20 +149,34 @@ public class GameActivity extends Activity {
 	}
 
 	private void onResumeGameHandler() {
+
+		String fastestWorkout = ps.getWorkoutDataFromSharedPrefs(GameActivity.this, StatKeys.FastestDeck);
+		String pattern = "duration: (\\d+:\\d\\d)";
+		Pattern r = Pattern.compile(pattern);
+		String fastestWorkoutTime = "";
+		Matcher m = r.matcher(fastestWorkout);
+		if (m.find()) {
+			fastestWorkoutTime = fastestWorkoutTime + m.group(1);
+		}
+		TextView timeToBeat = (TextView) findViewById(R.id.time_to_beat);
+		timeToBeat.setText("time to beat: " + fastestWorkoutTime);
+		
+		
+		
 		
 		switch (getGameState()) 
 		{
 		case Solo: 
 			if (!chronoRunning) 
 			{ // if resuming instead of starting a new game
-				TextView gameTypeDisplay = (TextView) findViewById(R.id.solo_deck_title);
+				TextView gameTypeDisplay = (TextView) findViewById(R.id.deck_title);
 				gameTypeDisplay.setText("Solo Game");
 				startChronoIfNotRunningAndDisplayCurrentCard(); // starts timer and displays current card
 			}
 			break;
 		case StartingDuoPlayAsSender:
-			((TextView) findViewById(R.id.solo_deck_title)).setText("Duo Game");
-			
+			((TextView) findViewById(R.id.deck_title)).setText("Duo Game");
+
 			sendShuffledOrder();
 			pauseChronoAndShowModal();
 			runOnUiThread(new Runnable() {
@@ -170,7 +187,7 @@ public class GameActivity extends Activity {
 						if (getGameState() != GameStates.StartingDuoPlayAsSender)
 							break;
 						else if (getGameState() == GameStates.StartingDuoPlayAsSender
-							&& duoDeckApp.delayedService == 1) {
+								&& duoDeckApp.delayedService == 1) {
 							System.out.println("update StartingDuoPlayAsSender in runnable");
 							startChronoIfNotRunningAndDisplayCurrentCard();
 							setGameState(GameStates.BothWorkingOut);
@@ -186,7 +203,7 @@ public class GameActivity extends Activity {
 			});
 			break;
 		case StartingDuoPlayAsReceiver:
-			((TextView) findViewById(R.id.solo_deck_title)).setText("Duo Game");
+			((TextView) findViewById(R.id.deck_title)).setText("Duo Game");
 			pauseChronoAndShowModal();
 			runOnUiThread(new Runnable() {
 				//ugly hack
@@ -196,7 +213,7 @@ public class GameActivity extends Activity {
 						if (getGameState() != GameStates.StartingDuoPlayAsReceiver) 
 							break;
 						else if (getGameState() == GameStates.StartingDuoPlayAsReceiver
-							&& duoDeckApp.getDeckOrder() != null) {
+								&& duoDeckApp.getDeckOrder() != null) {
 							setDeckOrderAndStartWorkout();
 							break;
 						} else {
@@ -231,34 +248,37 @@ public class GameActivity extends Activity {
 	public void doneWithThisCard(View view) 
 	{
 		System.out.println("done with card. game state: " + getGameState());
+		
+		// record stats about card that was just completed
+		switch (currentCard.getExerciseAsInt())
+		{
+		// TODO: make this dynamic instead of hard coded
+		case 0:
+			deck.pushups.incrementCount(currentCard.getValue());
+			// TODO: add time duration summation
+			break;
+			// TODO: make this dynamic instead of hard coded
+		case 1:
+			deck.pushups.incrementCount(currentCard.getValue());
+			// TODO: add time duration summation
+			break;
+			// TODO: make this dynamic instead of hard coded
+		case 2:
+			deck.situps.incrementCount(currentCard.getValue());
+			// TODO: add time duration summation
+			break;
+			// TODO: make this dynamic instead of hard coded
+		case 3:
+			deck.situps.incrementCount(currentCard.getValue());
+			// TODO: add time duration summation
+			break;
+		}
+
+
 		switch (getGameState()) 
 		{
 		case Solo:
-			// record stats about card that was just completed
-			switch (currentCard.getExerciseAsInt())
-			{
-			// TODO: make this dynamic instead of hard coded
-			case 0:
-				deck.pushups.incrementCount(currentCard.getValue());
-				// TODO: add time duration summation
-				break;
-				// TODO: make this dynamic instead of hard coded
-			case 1:
-				deck.pushups.incrementCount(currentCard.getValue());
-				// TODO: add time duration summation
-				break;
-				// TODO: make this dynamic instead of hard coded
-			case 2:
-				deck.situps.incrementCount(currentCard.getValue());
-				// TODO: add time duration summation
-				break;
-				// TODO: make this dynamic instead of hard coded
-			case 3:
-				deck.situps.incrementCount(currentCard.getValue());
-				// TODO: add time duration summation
-				break;
-			}
-			
+
 			if (deck.getCardsRemaining() > 0) 
 			{ // if not done with deck
 
@@ -267,7 +287,7 @@ public class GameActivity extends Activity {
 				// display the next card
 				System.out.println("displayCurrentCard in SOLO");
 				displayCurrentCard();
-				
+
 				deck.inGameStats.duration = ((Chronometer) getChronometer()).getText().toString();					
 
 			} else { // if done with deck
@@ -286,8 +306,8 @@ public class GameActivity extends Activity {
 				buttonNextCard.setOnClickListener(null);
 
 				// show "finished" text and provide button to stats activity
-//				View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-//				buttonGotoStats.setVisibility(View.VISIBLE);
+				//				View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+				//				buttonGotoStats.setVisibility(View.VISIBLE);
 				gotoStatsFromGame();
 			}
 
@@ -334,7 +354,7 @@ public class GameActivity extends Activity {
 		System.out.println("Calling start chrono, " + getGameState());
 		dismissModal();
 		duoDeckApp.delayedService = 0;
-		
+
 		// start chrono if not running
 		if (!chronoRunning) { 
 			startChronometer(null); 
@@ -353,31 +373,43 @@ public class GameActivity extends Activity {
 	private void displayCurrentCard() 
 	{		
 		setFontSizeToMax();
+
+		changeBackgroundBasedOnCardsLeft(5);
 		
 		// get new card
 		currentCard = deck.getAndPullNextCardFromDeck();
 		System.out.println("current card: " + currentCard.toString() + " : " + deck.getCardsRemaining() + "/" + deck.getDeckSize());
-		
+
 		// display card
 		Button doneWithCard = (Button) findViewById(R.id.done_with_this_card);
 		doneWithCard.setText(currentCard.toString());
 
 		TextView progressDisplay = (TextView) findViewById(R.id.progress_tracking);
 		progressDisplay.setText(deck.getCardsRemaining() + "/" + deck.getDeckSize() );
-		
+
 		// ---debugging------------
 		// show full deck
-//		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
-//		deckInfo.setText(deck.showDeck());
+		//		TextView deckInfo = (TextView) findViewById(R.id.display_deck_info);
+		//		deckInfo.setText(deck.showDeck());
 		if (currentCard.equals(Deck.finishedCard) && buddyCardIndex == 0) {
 			this.goToStatePage();
 		}
 	}
 	
+	private void changeBackgroundBasedOnCardsLeft (int minimumCardCount) 
+	{
+		if (deck.getCardsRemaining() < minimumCardCount + 1) 
+		{
+			Button doneWithCard = (Button) findViewById(R.id.done_with_this_card);
+			doneWithCard.setBackgroundColor(Color.BLACK);
+			doneWithCard.setTextColor(Color.RED);
+		}
+	}
+
 	private void goToStatePage() {
-		
+
 		this.dismissModal();
-		
+
 		stopChronometer(null);
 		setGameState(GameStates.Solo);
 		System.out.println("finished deck");
@@ -392,15 +424,15 @@ public class GameActivity extends Activity {
 		View buttonNextCard = findViewById(R.id.done_with_this_card);
 		buttonNextCard.setOnClickListener(null);
 
-//		setGameState(GameStates.Solo);
+		//		setGameState(GameStates.Solo);
 
 		// show "finished" text and provide button to stats activity
-//		View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
-//		buttonGotoStats.setVisibility(View.VISIBLE);
+		//		View buttonGotoStats = findViewById(R.id.gotoStatsFromGame);
+		//		buttonGotoStats.setVisibility(View.VISIBLE);
 
 		gotoStatsFromGame();
 	}
-	
+
 	public void showModalMessage(String msg, boolean showOk) {
 
 		dismissModal();
@@ -425,7 +457,7 @@ public class GameActivity extends Activity {
 		startActivity(intent);
 		finish(); // kills game activity
 	};
-	
+
 	/* 
 	 * CHRONOMETER
 	 */
@@ -489,7 +521,7 @@ public class GameActivity extends Activity {
 	private synchronized void setDeckOrderAndStartWorkout() {
 		if (getGameState() == GameStates.StartingDuoPlayAsReceiver) {
 			buddyCardIndex = deck.getCardsRemaining() + 1;
-	
+
 			int[] targetOrder = duoDeckApp.getDeckOrder();
 			System.out.println("Target order: " + Arrays.toString(targetOrder));
 			if (targetOrder == null) {
@@ -499,7 +531,7 @@ public class GameActivity extends Activity {
 				this.deck.setOrderToMatch(targetOrder);
 				this.startChronoIfNotRunningAndDisplayCurrentCard();
 				this.sendShuffledOrderResponse();
-	
+
 				setGameState(GameStates.BothWorkingOut);
 			}
 		}
@@ -541,16 +573,16 @@ public class GameActivity extends Activity {
 	{
 		return duoDeckApp.getCurrentGameState();
 	}
-	
+
 	/*
 	 * Aesthetic adjustments
 	 */
 	public void setFontSizeToMax() 
 	{
 		Button doneWithCard = (Button) findViewById(R.id.done_with_this_card);
-		
+
 		String before = doneWithCard.getText().toString(); 
-		
+
 		// Determine Scaled Density for later calculations
 		Display dd = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics dm = new DisplayMetrics();
@@ -559,25 +591,25 @@ public class GameActivity extends Activity {
 
 		Rect bounds = new Rect();
 		Paint p = new Paint();
-		
+
 		p.setTypeface(doneWithCard.getTypeface());
 
 		String sample = "22 pushups"; //doneWithCard.getText().toString();
 		int maxFont;
 		for (maxFont = 30; 
-//					-bounds.top <= doneWithCard.getHeight() && 
-					bounds.right <= doneWithCard.getWidth(); 
+				//					-bounds.top <= doneWithCard.getHeight() && 
+				bounds.right <= dm.widthPixels; 
 				maxFont++) {
-		  p.setTextSize(maxFont);
-		  p.getTextBounds(sample, 0, sample.length(), bounds);
+			p.setTextSize(maxFont);
+			p.getTextBounds(sample, 0, sample.length(), bounds);
 		}
 		maxFont = (int) ((maxFont - 1) / m_ScaledDensity);
 		doneWithCard.setTextSize(maxFont);
 
 		String after = doneWithCard.getText().toString();
-		
+
 		doneWithCard.setText(doneWithCard.getText());
-		
+
 		System.out.println(
 				"before: " + before + "\t\t after: " + after + 
 				"\t\t maxFont: " + maxFont +

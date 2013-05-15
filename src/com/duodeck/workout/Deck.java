@@ -48,9 +48,9 @@ public class Deck {
 		// TODO: dynamically set the size of the suits based on the card's available suits
 		for (int a=0; a<=3; a++)
 		{
-			for (int b=0; b<=12; b++)
+//			for (int b=0; b<=12; b++)
 			// TODO: uncomment the above line for the full deck 
-//			for (int b=0; b<=3; b++)
+			for (int b=0; b<=3; b++)
 			{
 			   cards.add( new Card(a,b) );
 			}
