@@ -308,7 +308,9 @@ public class DuoDeckService extends Service implements DuoDeckConnectionListener
 				}
 				break;
 			default:
-				if (myTimeElapse > 25) {
+				GameStates g = duoDeckApp.getCurrentGameState();
+				if (myTimeElapse > 25 && g != GameStates.Solo && g != GameStates.MeInviting
+						&& g != GameStates.BuddyInviting && g != GameStates.BothDone) {
 					sendMsgToClient(MSG_REPEAT_DONE_WITH_CARD, 0, 0);
 				} else if (sessionElapse > 300) { // if idle for more than 5min, provide as a settings edit-able
 					System.out.println("Expiring workout session");

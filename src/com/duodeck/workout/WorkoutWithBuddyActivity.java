@@ -37,6 +37,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 	private Account[] accounts = null;
 	private Account accSelected = null;
 	private int authAttempt = 0;
+	private String buddyName = null;
 	
 	private Messenger mService = null;
 	private DuoDeckApplication duoDeckApp;
@@ -125,6 +126,7 @@ public class WorkoutWithBuddyActivity extends Activity {
 				switch(duoDeckApp.getCurrentGameState()) {
 				case Solo:
 					sendMsgToService(DuoDeckService.MSG_INVITE, pos, 1);
+					buddyName = duoDeckApp.getContactList().get(pos);
 					AlertDialog.Builder builder = new AlertDialog.Builder(WorkoutWithBuddyActivity.this);
 					builder.setTitle("Waiting for buddy to respond...");
 					/*builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -272,11 +274,9 @@ public class WorkoutWithBuddyActivity extends Activity {
 	private void actOnInviteResponse(int success) {
 		System.out.println("Inside act on invite response: " + success);
 		this.dismissPopup();
-		String buddy = "";
-		if (accSelected != null)
-			buddy = accSelected.name;
-		if (success == 0) {
-			Toast.makeText(this, buddy + " requested for a different time", Toast.LENGTH_LONG).show();
+		
+		if (success == 0 && buddyName != null) {
+			Toast.makeText(this, buddyName + " requested for a different time", Toast.LENGTH_LONG).show();
 			duoDeckApp.setCurrentGameState(GameStates.Solo);
 		} else {
 			duoDeckApp.delayedService = 1;
